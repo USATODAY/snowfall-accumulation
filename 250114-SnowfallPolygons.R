@@ -50,8 +50,12 @@ labels <- c("0", "0.1", "1", "2", "3",
             "24", "30", "36", "48", "60", 
             "72", "96", "120", ">120")
 
+#Form what the column name should be. 
+column_name <- paste0("sfav2_CONUS_24h_", format(Sys.Date(), "%Y%m%d"), hour)
+
 # Use cut() to assign color categories based on the breaks
-r_poly_sf$color_factor <- cut(r_poly_sf$sfav2_CONUS_24h_2025011412, 
+r_poly_sf$color_factor <- cut(r_poly_sf[[column_name]],
+                              #r_poly_sf$sfav2_CONUS_24h_2025011412, 
                               breaks = breaks, 
                               labels = labels, 
                               include.lowest = FALSE, 
@@ -61,12 +65,12 @@ r_poly_sf$color_factor <- cut(r_poly_sf$sfav2_CONUS_24h_2025011412,
 r_poly_sf$colors <- colors[as.numeric(r_poly_sf$color_factor)]
 
 #Spatial join all the 0.1 values between breaks together. This will reduce from hundreds of polygons to <=18 categories.
-r_poly_sf <- r_poly_sf %>%
+r_poly_sf2 <- r_poly_sf %>%
   group_by (color_factor, colors) %>%
   summarize (geometry = st_union (geometry))
 
 # Plot using ggplot2
-ggplot(r_poly_sf) +
+ggplot(r_poly_sf2) +
   geom_sf(aes(fill = color_factor), color = "black") +
   scale_fill_manual(values = setNames(colors, labels), 
                     breaks = labels,  # Make sure all labels are included in the legend
@@ -77,4 +81,4 @@ ggplot(r_poly_sf) +
 
 #Save as .gpkg (can change to GeoJSON or whatever form you need) 
 #color_factor should match to the snowfall amount in the scale at https://www.nohrsc.noaa.gov/snowfall/
-st_write (r_poly_sf, paste0("outputs/", format(Sys.time(), "%y%m%d_%H%M"), "_24h_snow_accumulation.geojson"), append=FALSE)
+st_write (r_poly_sf2, paste0("outputs/", format(Sys.time(), "%y%m%d_%H%M"), "_24h_snow_accumulation.geojson"), append=FALSE)
