@@ -3,7 +3,6 @@ library(terra)
 library(sf)
 library(ggplot2)
 library(tidyverse)
-library(rvest)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
@@ -34,15 +33,16 @@ r_poly_sf <- st_as_sf(r_poly)
 breaks <- c(-0.01, 0, 0.1, 1, 2, 
             3, 4, 6, 8, 12, 
             18, 24, 30, 36, 48, 
-            60, 72, 96, 120, 500)  # Added -0.001 to handle zero explicitly
+            60, 72, 96, 120, 500)  # Added -0.01 and 500 to handle zero + >120 explicitly
 
 #Multiply by 10 to match the rounding done above.
 breaks = breaks*10
 
+#used https://imagecolorpicker.com/ with the png file to set these 19 colors based on NOAA scale.
 colors <- c("#ffffff", "#e4eef4", "#bdd7e7", "#6bafd6", "#2d83be", 
             "#02509d", "#022195", "#fefe96", "#ffc500", "#ff8800", 
             "#dc0c00", "#9f0000", "#690000", "#330000", "#cdcdff", 
-            "#a08dd9", "#7d51a6", "#551573", "#290030")  # 19 colors for 19 intervals
+            "#a08dd9", "#7d51a6", "#551573", "#290030")  
 
 # Define the corresponding labels (numeric values)
 labels <- c("0", "0.1", "1", "2", "3", 
