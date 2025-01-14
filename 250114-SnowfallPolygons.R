@@ -52,7 +52,6 @@ labels <- c("0", "0.1", "1", "2", "3",
 
 # Use cut() to assign color categories based on the breaks
 r_poly_sf$color_factor <- cut(r_poly_sf$sfav2_CONUS_24h_2025011412, 
-#r_poly_sf$color_factor <- cut(r_poly_sf$sfav2_CONUS_24h_2025011418, 
                               breaks = breaks, 
                               labels = labels, 
                               include.lowest = FALSE, 
