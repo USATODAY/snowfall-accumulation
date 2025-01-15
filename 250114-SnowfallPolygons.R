@@ -2,6 +2,9 @@
 library(terra)
 library(sf)
 library(dplyr)
+library(stringr)
+library(tesseract)
+library(lubridate)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
@@ -21,6 +24,16 @@ hour <- if (as.numeric(format(Sys.time(), "%H")) >= 12 && as.numeric(format(Sys.
 path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", format(Sys.Date(), "%Y%m"), "/sfav2_CONUS_24h_", format(Sys.Date(), "%Y%m%d"), hour, ".tif")
 #season accumulation
 #path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/202501/sfav2_CONUS_2024093012_to_", format(Sys.Date(), "%Y%m%d"), hour, ".tif")
+
+path_to_image <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", format(Sys.Date(), "%Y%m"), "/sfav2_CONUS_24h_", format(Sys.Date(), "%Y%m%d"), hour, ".png")
+
+#OCR the image, which includes the ending time, count of reports and data update time.
+text <- tesseract::ocr(path_to_image)
+#Extract those three elements
+reports <- str_extract(text, "\\d+(?=\\s*reports)")
+print (paste(reports, "reports"))
+data_updated <- ymd_hms(str_extract(text, "(?<=issued\\s).*?UTC"))
+actual_hour <- str_split(str_extract(text, "(?<=ending\\s).*?UTC"), " ")[1][[1]][2]
 
 # Load the raster
 r <- rast(path_to_raster)
@@ -89,8 +102,9 @@ if (eval == TRUE){
     labs(fill = "Value Categories") +
     theme(legend.position = "bottom")
 }
-  
+
 #Save as .gpkg (can change to GeoJSON or whatever form you need) 
 #color_factor should match to the snowfall amount in the scale at https://www.nohrsc.noaa.gov/snowfall/
 #st_write (r_poly_sf2, paste0("outputs/", format(Sys.time(), "%y%m%d_%H%M"), "_24h_snow_accumulation.geojson"), append=FALSE)
-st_write (r_poly_sf2, paste0("outputs/", format(Sys.Date(), "%Y%m%d"), hour, "_24h_snow_accumulation.geojson"), append=FALSE)
+#st_write (r_poly_sf2, paste0("outputs/", format(Sys.Date(), "%Y%m%d"), hour, "_24h_snow_accumulation.geojson"), append=FALSE)
+st_write (r_poly_sf2, paste0("outputs/", format(Sys.Date(), "%Y%m%d"), actual_hour, "_", format(data_updated, "%H%M%S"), "_24h_snow_accumulation.geojson"), append=FALSE)
