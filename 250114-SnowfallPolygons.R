@@ -5,6 +5,9 @@ library(dplyr)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
+#Set time zone to pull files using Eastern time so GitHub Actions doesn't use UTC.
+Sys.setenv(TZ="America/New_York")
+
 # Form path to URL: First, check the time and output 12 or 00
 hour <- if (as.numeric(format(Sys.time(), "%H")) >= 12 && as.numeric(format(Sys.time(), "%H")) < 24) {
   "12"
@@ -72,6 +75,7 @@ r_poly_sf2 <- r_poly_sf %>%
   group_by (color_factor, colors) %>%
   summarize (geometry = st_union (geometry))
 
+eval=TRUE
 eval=FALSE
 if (eval == TRUE){
   library(ggplot2)
