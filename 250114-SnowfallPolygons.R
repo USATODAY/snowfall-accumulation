@@ -1,8 +1,7 @@
 # Load required libraries
 library(terra)
 library(sf)
-library(ggplot2)
-library(tidyverse)
+library(dplyr)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
@@ -15,7 +14,10 @@ hour <- if (as.numeric(format(Sys.time(), "%H")) >= 12 && as.numeric(format(Sys.
 
 #Save path to most current raster
 #6h raster <- "https://www.nohrsc.noaa.gov/snowfall/data/202501/sfav2_CONUS_6h_2025011418.tif"
-path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/202501/sfav2_CONUS_24h_", format(Sys.Date(), "%Y%m%d"), hour, ".tif")
+
+path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", format(Sys.Date(), "%Y%m"), "/sfav2_CONUS_24h_", format(Sys.Date(), "%Y%m%d"), hour, ".tif")
+#season accumulation
+#path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/202501/sfav2_CONUS_2024093012_to_", format(Sys.Date(), "%Y%m%d"), hour, ".tif")
 
 # Load the raster
 r <- rast(path_to_raster)
@@ -52,6 +54,7 @@ labels <- c("0", "0.1", "1", "2", "3",
 
 #Form what the column name should be. 
 column_name <- paste0("sfav2_CONUS_24h_", format(Sys.Date(), "%Y%m%d"), hour)
+#column_name <- paste0("sfav2_CONUS_2024093012_to_", format(Sys.Date(), "%Y%m%d"), hour)
 
 # Use cut() to assign color categories based on the breaks
 r_poly_sf$color_factor <- cut(r_poly_sf[[column_name]],
@@ -69,16 +72,21 @@ r_poly_sf2 <- r_poly_sf %>%
   group_by (color_factor, colors) %>%
   summarize (geometry = st_union (geometry))
 
-# Plot using ggplot2
-ggplot(r_poly_sf2) +
-  geom_sf(aes(fill = color_factor), color = "black") +
-  scale_fill_manual(values = setNames(colors, labels), 
-                    breaks = labels,  # Make sure all labels are included in the legend
-                    labels = labels) +  # Ensure the labels are displayed in the legend
-  theme_minimal() +
-  labs(fill = "Value Categories") +
-  theme(legend.position = "bottom")
-
+eval=FALSE
+if (eval == TRUE){
+  library(ggplot2)
+  # Plot using ggplot2
+  ggplot(r_poly_sf2) +
+    geom_sf(aes(fill = color_factor), color = "black") +
+    scale_fill_manual(values = setNames(colors, labels), 
+                      breaks = labels,  # Make sure all labels are included in the legend
+                      labels = labels) +  # Ensure the labels are displayed in the legend
+    theme_minimal() +
+    labs(fill = "Value Categories") +
+    theme(legend.position = "bottom")
+}
+  
 #Save as .gpkg (can change to GeoJSON or whatever form you need) 
 #color_factor should match to the snowfall amount in the scale at https://www.nohrsc.noaa.gov/snowfall/
-st_write (r_poly_sf2, paste0("outputs/", format(Sys.time(), "%y%m%d_%H%M"), "_24h_snow_accumulation.geojson"), append=FALSE)
+#st_write (r_poly_sf2, paste0("outputs/", format(Sys.time(), "%y%m%d_%H%M"), "_24h_snow_accumulation.geojson"), append=FALSE)
+st_write (r_poly_sf2, paste0("outputs/", format(Sys.Date(), "%Y%m%d"), hour, "_24h_snow_accumulation.geojson"), append=FALSE)
