@@ -6,7 +6,7 @@ library(stringr)
 library(tesseract)
 library(lubridate)
 library(tidyr)
-library(geosonio)
+library(geojsonio)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
