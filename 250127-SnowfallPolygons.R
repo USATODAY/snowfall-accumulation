@@ -6,6 +6,7 @@ library(stringr)
 library(tesseract)
 library(lubridate)
 library(tidyr)
+library(geosonio)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
@@ -114,3 +115,12 @@ save_files <- function(x){
   st_write (snow_list[[x]], paste0("outputs/", substr(timeframes[x], 1,3), "/", format(Sys.Date(), "%Y%m%d"), hour, "_", format(ocr_list[[x]], "%H%M%S"), "_", timeframes[x], "snow_accumulation.geojson"), append=FALSE)
 }
 lapply (1:length(timeframes), save_files)
+
+
+save_files2 <- function(x){
+  geojsonio::topojson_write(snow_list[[x]], 
+                            file = paste0("outputs/", substr(timeframes[x], 1,3), "/", format(Sys.Date(), "%Y%m%d"), hour, "_", format(ocr_list[[x]], "%H%M%S"), "_", timeframes[x], "snow_accumulation.json"),
+                            object_name = "snowfall",
+                            overwrite = TRUE)
+}
+lapply (1:length(timeframes), save_files2)
