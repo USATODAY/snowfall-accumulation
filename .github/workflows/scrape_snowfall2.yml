@@ -2,7 +2,7 @@ name: scrape_snowfall2
 
 on:
   schedule:
-    - cron: '*/20 * * * *' # Run every 20 minutes
+    - cron: '15 * * * *' # Run at quarter after every hour
     #- cron: '30 5 * * *' # Run at 12:30 a.m. EST 
     #- cron: '30 17 * * *' # Run at 12:30 p.m. EST 
   workflow_dispatch:
