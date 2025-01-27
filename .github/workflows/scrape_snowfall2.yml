@@ -1,4 +1,4 @@
-name: scrape_snowfall
+name: scrape_snowfall2
 
 on:
   schedule:
