@@ -111,6 +111,6 @@ ocr_list <- lapply(timeframes, ocr_text)
 
 #Save as GeoJSON using updated time.
 save_files <- function(x){
-  st_write (snow_list[[x]], paste0("outputs/", format(Sys.Date(), "%Y%m%d"), hour, "_", format(ocr_list[[x]], "%H%M%S"), "_", timeframes[x], "snow_accumulation.geojson"), append=FALSE)
+  st_write (snow_list[[x]], paste0("outputs/", substr(timeframes[x], 1,3), "/", format(Sys.Date(), "%Y%m%d"), hour, "_", format(ocr_list[[x]], "%H%M%S"), "_", timeframes[x], "snow_accumulation.geojson"), append=FALSE)
 }
 lapply (1:length(timeframes), save_files)
