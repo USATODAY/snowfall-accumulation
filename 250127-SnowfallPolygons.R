@@ -5,6 +5,7 @@ library(dplyr)
 library(stringr)
 library(tesseract)
 library(lubridate)
+library(tidyr)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
