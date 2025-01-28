@@ -33,5 +33,5 @@ gcs_file_path = "snowfall-accumulation/24h_snow_accumulation_latest.json"
 # Upload the files to GCS for each timeframe
 for file_path, gcs_path in zip(file_paths, gcs_file_paths):
     upload_to_gcs(file_path, bucket_name, gcs_path)
-	print(f"Uploaded {file_path} to Google Cloud Storage.")
+    print(f"Uploaded {file_path} to Google Cloud Storage.")
 # %%
