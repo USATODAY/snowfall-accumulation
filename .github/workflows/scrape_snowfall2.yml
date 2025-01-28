@@ -28,6 +28,14 @@ jobs:
             any::lubridate 
             any::tidyr
             any::geojsonio
+      
+      #Added to try caching to save time.      
+      - name: Cache R packages
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
 
       - name: Check out repository
         uses: actions/checkout@v3
