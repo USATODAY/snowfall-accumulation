@@ -88,7 +88,7 @@ raster2vector <- function(timeframe){
 }
 
 # iterate the function for 24hr, 48hr and 72hr accumulations
-#snow_list <- lapply(timeframes, raster2vector)
+snow_list <- lapply(timeframes, raster2vector)
 
 # also get season accumulation
 # it's a slightly different format so getting that separately
@@ -179,12 +179,12 @@ raster2vector_season <- function() {
   
   return(r_poly_sf3)
 }
-#snow_list[[4]] <- raster2vector_season()
+snow_list[[4]] <- raster2vector_season()
 
-snow_list <- raster2vector_season()
+#snow_list <- raster2vector_season()
 
 # adding "season" now
-timeframes <- c("season_")
+timeframes <- c(timeframes, "season_")
 
 # get some additional info for the chatter
 ocr_text <- function(timeframe){
@@ -238,7 +238,8 @@ ocr_list <- lapply(timeframes, ocr_text)
 
 #Save as TopoJSON, overwriting "latest" file.
 save_files1 <- function(x){
-  geojsonio::topojson_write(snow_list, 
+  #geojsonio::topojson_write(snow_list, 
+  geojsonio::topojson_write(snow_list[[x]], 
                             file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "snow_accumulation_latest.json"),
                             object_name = "snowfall",
                             overwrite = TRUE)
@@ -247,7 +248,8 @@ lapply (1:length(timeframes), save_files1)
 
 #Save as TopoJSON using updated time to maintain record.
 save_files2 <- function(x){
-  geojsonio::topojson_write(snow_list, 
+  #geojsonio::topojson_write(snow_list, 
+  geojsonio::topojson_write(snow_list[[x]], 
                             file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", format(Sys.Date(), "%Y%m%d"), hour, "_", format(ocr_list[[x]], "%H%M%S"), "_", timeframes[x], "snow_accumulation.json"),
                             object_name = "snowfall",
                             overwrite = TRUE)
