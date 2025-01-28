@@ -1,4 +1,4 @@
-name: scrape_snowfall2
+name: Scrape snowfall (all 4)
 
 on:
   schedule:
@@ -47,12 +47,11 @@ jobs:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
           
-      #REMOVED git commit -m "Latest data: $(date)" || exit 0
-    
-      #- name: Commit any changes
-      #ORIG 
-      #git config --local user.email "actions@github.com"
-          #git config --local user.name "GitHub Actions"
-          #git add --all
-          #git commit -am "Latest data: $(date)"
-          #git push origin main
+      - name: Trigger push to Google Cloud
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-workflow-2
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

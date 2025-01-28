@@ -1,8 +1,8 @@
-name: push_to_gcp
+name: Push files to GCP
 
 on:
-  #schedule:
-  #  - cron: '0 */6 * * *' # Run every six hours
+  repository_dispatch:
+    types: [trigger-workflow-2]
   workflow_dispatch:
 #  push:
 #    branches: main
