@@ -24,8 +24,10 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
         
-      - name: Push to GCP
-        uses: 'google-github-actions/auth@v2'
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v2
         with:
-            GCS_AUTH_FILE: '${{ secrets.GOOGLE_CREDENTIALS }}' 
+          GCS_AUTH_FILE: '${{ secrets.GOOGLE_CREDENTIALS }}'
+
+      - name: Run R script
         run: Rscript -e 'source("250127-SnowfallPolygons_season.R")'
