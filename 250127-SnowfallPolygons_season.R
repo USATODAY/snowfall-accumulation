@@ -79,10 +79,10 @@ raster2vector <- function(timeframe){
     group_by (color_factor, colors) %>%
     summarize (geometry = st_union (geometry)) %>%
     drop_na() %>%
-    filter (color_factor != 0) %>%
+    filter (color_factor != 0) %>% 
     ungroup() %>%
-    rename (hue = colors) %>%
-    select (hue)
+    #rename (hue = colors) %>%
+    select (color_factor)
   
   return(r_poly_sf2)
 }
@@ -169,8 +169,8 @@ raster2vector_season <- function() {
     drop_na() %>% # the 48h and 72h file had some NA outline showing as black, removing those
     filter (color_factor != "0 in") %>%
     ungroup() %>%
-    rename (hue = colors) %>%
-    select (hue)
+    #rename (hue = colors) %>%
+    select (color_factor)
   
   #Validate geometry and then simplify slightly to reduce file size
   r_poly_sf3 <- r_poly_sf2 %>%
