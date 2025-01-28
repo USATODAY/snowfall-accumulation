@@ -5,6 +5,8 @@ library(stringr)
 # Ensure you have set up authentication JSON key beforehand
 #Sys.setenv(GCS_AUTH_FILE = "/Users/AFast/Downloads/key2.json")
 #gcs_auth("/Users/AFast/Downloads/storage-key.json")
+#Pull credential json from GitHub secrets
+gcs_auth(Sys.getenv("GCS_AUTH_FILE"))
 
 # Function to upload file to Google Cloud Storage
 upload_to_gcs <- function(local_file_path, bucket_name, gcs_file_path) {
