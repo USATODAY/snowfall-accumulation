@@ -1,5 +1,6 @@
 print("STARTING SCRIPT")
 library(googleCloudStorageR)
+print("LOADED gcloud LIBRARY")
 library(stringr)
 
 # Authenticate with Google Cloud
