@@ -31,7 +31,7 @@ jobs:
       
       #Added to try caching to save time.      
       - name: Cache R packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4 #changed from 2>4 because 2 is being phased out.
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
