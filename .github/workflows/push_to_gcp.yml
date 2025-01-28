@@ -17,12 +17,6 @@ jobs:
       - name: Install googleCloudStorageR
         run: Rscript -e 'install.packages("googleCloudStorageR", dependencies = TRUE, repos = "http://cran.r-project.org")'
 
-      - name: Install other packages
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          packages: |
-            #any::googleCloudStorageR
-            any::stringr
 
       - name: Check out repository
         uses: actions/checkout@v3

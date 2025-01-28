@@ -1,7 +1,6 @@
 print("STARTING SCRIPT")
 library(googleCloudStorageR)
 print("LOADED gcloud LIBRARY")
-library(stringr)
 
 # Authenticate with Google Cloud
 # Ensure you have set up authentication JSON key beforehand
@@ -27,9 +26,9 @@ bucket_name <- "your-life-in-data"
 #gcs_file_path <- "snowfall-accumulation/24h_snow_accumulation_latest.json"
 #upload_to_gcs(local_file_path, bucket_name, gcs_file_path)
 
-timeframes <- c("24h_", "48h_", "72h_", "season_")
+timeframes <- c("24h", "48h", "72h", "season")
 
-file_paths <- paste0("outputs/", str_remove(timeframes, "_"), "/", timeframes, "snow_accumulation_latest.json")
+file_paths <- paste0("outputs/", timeframes, "/", timeframes, "_snow_accumulation_latest.json")
 gcs_file_paths <- paste0("snowfall-accumulation/", timeframes, "snow_accumulation_latest.json")
 
 gcs_file_path <- "snowfall-accumulation/24h_snow_accumulation_latest.json"
