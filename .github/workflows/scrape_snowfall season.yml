@@ -1,0 +1,55 @@
+name: scrape_snowfall_season
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Run every six hours
+  workflow_dispatch:
+#  push:
+#    branches: main
+
+jobs:
+  import-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::terra
+            any::sf
+            any::dplyr 
+            any::stringr
+            any::tesseract
+            any::lubridate 
+            any::tidyr
+            any::geojsonio
+
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Scrape latest snowfall season accumulation data
+        run: Rscript -e 'source("250127-SnowfallPolygons_season.R")'
+        
+      - name: Commit results
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add --all
+          git commit -m "Latest data: $(date)" || exit 0
+          git push 
+        env:
+          REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+          username: github-actions
+          
+      #REMOVED git commit -m "Latest data: $(date)" || exit 0
+    
+      #- name: Commit any changes
+      #ORIG 
+      #git config --local user.email "actions@github.com"
+          #git config --local user.name "GitHub Actions"
+          #git add --all
+          #git commit -am "Latest data: $(date)"
+          #git push origin main
