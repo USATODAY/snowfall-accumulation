@@ -1,9 +1,10 @@
+print("STARTING SCRIPT")
 library(googleCloudStorageR)
 library(stringr)
 
 # Authenticate with Google Cloud
 # Ensure you have set up authentication JSON key beforehand
-#Sys.setenv(GCS_AUTH_FILE = "/Users/AFast/Downloads/key2.json")
+#Sys.setenv(GCS_AUTH_FILE = "/Users/AFast/Downloads/storage-key.json")
 #gcs_auth("/Users/AFast/Downloads/storage-key.json")
 #Pull credential json from GitHub secrets
 gcs_auth(Sys.getenv("GCS_AUTH_FILE"))

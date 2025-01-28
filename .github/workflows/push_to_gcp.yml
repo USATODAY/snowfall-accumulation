@@ -27,6 +27,17 @@ jobs:
       - name: Save GCP credentials to temp file
         run: echo "${{ secrets.GOOGLE_CREDENTIALS }}" > gcp-key.json
 
+      - name: Verify GCP credentials file
+        run: |
+          if [ -f gcp-key.json ]; then
+            echo "GCP credentials file created successfully."
+            echo "First few lines of the file:"
+            head -n 5 gcp-key.json
+          else
+            echo "GCP credentials file not found!"
+            exit 1
+          fi
+
       - name: Run R script
         env:
           GCS_AUTH_FILE: gcp-key.json
