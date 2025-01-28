@@ -14,11 +14,14 @@ jobs:
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
 
-      - name: Install packages
+      - name: Install googleCloudStorageR
+        run: Rscript -e 'install.packages("googleCloudStorageR", dependencies = TRUE, repos = "http://cran.r-project.org")'
+
+      - name: Install other packages
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
-            any::googleCloudStorageR
+            #any::googleCloudStorageR
             any::stringr
 
       - name: Check out repository
@@ -37,6 +40,12 @@ jobs:
             echo "GCP credentials file not found!"
             exit 1
           fi
+          
+      - name: Test googleCloudStorageR
+        run: |
+          echo "library(googleCloudStorageR)" > test.R
+          Rscript test.R
+          
 
       - name: Run R script
         env:
