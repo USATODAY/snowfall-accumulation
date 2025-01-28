@@ -13,13 +13,25 @@ def upload_to_gcs(local_file_path, bucket_name, gcs_file_path):
     print(f"File {local_file_path} uploaded to {gcs_file_path}.")
 
 # Upload the CSV to Google Cloud Storage
-local_file_path = "outputs/24h/24h_snow_accumulation_latest.json"
-bucket_name = "your-life-in-data"
-gcs_file_path = "snowfall-accumulation/24h_snow_accumulation_latest.json"
+#local_file_path = "outputs/24h/24h_snow_accumulation_latest.json"
+#bucket_name = "your-life-in-data"
+#gcs_file_path = "snowfall-accumulation/24h_snow_accumulation_latest.json"
 
 # Upload the file to GCS
-upload_to_gcs(local_file_path, bucket_name, gcs_file_path)
+#upload_to_gcs(local_file_path, bucket_name, gcs_file_path)
 
-print("Scraping complete. New data saved locally and uploaded to Google Cloud Storage.")
+# Define the timeframes
+timeframes = ["24h", "48h", "72h", "season"]
 
+# Define the local file paths and GCS file paths
+file_paths = [f"outputs/{timeframe}/{timeframe}_snow_accumulation_latest.json" for timeframe in timeframes]
+gcs_file_paths = [f"snowfall-accumulation/{timeframe}snow_accumulation_latest.json" for timeframe in timeframes]
+
+# You can hardcode a specific GCS file path as needed
+gcs_file_path = "snowfall-accumulation/24h_snow_accumulation_latest.json"
+
+# Upload the files to GCS for each timeframe
+for file_path, gcs_path in zip(file_paths, gcs_file_paths):
+    upload_to_gcs(file_path, bucket_name, gcs_path)
+	print(f"Uploaded {file_path} to Google Cloud Storage.")
 # %%
