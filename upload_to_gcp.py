@@ -13,9 +13,9 @@ def upload_to_gcs(local_file_path, bucket_name, gcs_file_path):
     print(f"File {local_file_path} uploaded to {gcs_file_path}.")
 
 # Upload the CSV to Google Cloud Storage
-local_file_path <- "outputs/24h/24h_snow_accumulation_latest.json"
-bucket_name <- "your-life-in-data"
-gcs_file_path <- "snowfall-accumulation/24h_snow_accumulation_latest.json"
+local_file_path = "outputs/24h/24h_snow_accumulation_latest.json"
+bucket_name = "your-life-in-data"
+gcs_file_path = "snowfall-accumulation/24h_snow_accumulation_latest.json"
 
 # Upload the file to GCS
 upload_to_gcs(local_file_path, bucket_name, gcs_file_path)
