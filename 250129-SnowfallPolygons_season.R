@@ -5,7 +5,7 @@ library(dplyr)
 library(stringr)
 library(tesseract)
 library(lubridate)
-library(tidyr)
+#library(tidyr) #Can remove this with drop_na gone?
 library(jsonlite)
 library(tibble)
 
@@ -342,7 +342,7 @@ ocr_list <- lapply(ocr_list, ymd_hms)
 save_files1 <- function(x){
   #geojsonio::topojson_write(snow_list, 
   geojsonio::topojson_write(snow_list[[x]], 
-                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "_inches_snow_accumulation_latest.json"),
+                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "inches_snow_accumulation_latest.json"),
                             #file = paste0("outputs/test/", timeframes[x], "inches_snow_accumulation_latest.json"),
                             object_name = "snowfall",
                             overwrite = TRUE)
