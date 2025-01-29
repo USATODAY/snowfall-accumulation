@@ -24,8 +24,8 @@ bucket_name = "your-life-in-data"
 timeframes = ["24h", "48h", "72h", "season"]
 
 # Define the local file paths and GCP file paths
-file_paths = [f"outputs/{timeframe}/{timeframe}_snow_accumulation_latest.json" for timeframe in timeframes]
-gcs_file_paths = [f"snowfall-accumulation/{timeframe}_snow_accumulation_latest.json" for timeframe in timeframes]
+file_paths = [f"outputs/{timeframe}/{timeframe}_inches_snow_accumulation_latest.json" for timeframe in timeframes]
+gcs_file_paths = [f"snowfall-accumulation/{timeframe}_inches_snow_accumulation_latest.json" for timeframe in timeframes]
 
 # Upload the files to GCP for each timeframe
 for file_path, gcs_path in zip(file_paths, gcs_file_paths):
