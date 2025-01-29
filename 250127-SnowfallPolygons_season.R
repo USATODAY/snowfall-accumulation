@@ -6,12 +6,13 @@ library(stringr)
 library(tesseract)
 library(lubridate)
 library(tidyr)
+library(jsonlite)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
 #Set time zone to pull files using Eastern time so GitHub Actions doesn't use UTC.
 #Sys.setenv(TZ="America/New_York")
-#Sys.setenv(TZ="UTC")
+Sys.setenv(TZ="UTC")
 
 # Form path to URL: First, check the time and output 12 or 00 -- use 12 after 1 p.m. UTC. Otherwise, use 00.
 hour <- if (as.numeric(format(Sys.time(), "%H")) >= 13 && as.numeric(format(Sys.time(), "%H")) < 24) {
@@ -29,7 +30,24 @@ raster2vector <- function(timeframe){
   path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", format(Sys.Date(), "%Y%m"), "/sfav2_CONUS_", timeframe, format(Sys.Date(), "%Y%m%d"), hour, ".tif")
   
   # load the raster
-  r <- rast(path_to_raster)
+  #r <- rast(path_to_raster)
+  r <- try(rast(path_to_raster), silent = TRUE)
+  
+  # Check if path_to_raster hits 404 error because it hasn't been created yet.
+  if (inherits(r, "try-error")) {
+    #Create path to one version behind (if tried 12 UTC for 1/29/25, create path for 00 UTC 1/29/25, etc.)
+    new_path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", 
+                                 if_else (hour==12, format(Sys.Date(), "%Y%m"), format(Sys.Date()-days(1), "%Y%m")), 
+                                 "/sfav2_CONUS_", timeframe, 
+                                 if_else (hour==12, format(Sys.Date(), "%Y%m%d"), format(Sys.Date()-days(1), "%Y%m%d")), 
+                                 if_else (hour==12, "00", "12"), ".tif")
+    print(paste(substr(path_to_raster, nchar(path_to_raster) - 29, nchar(path_to_raster)), "is unavailable."))
+    print(paste("Now trying", substr(new_path_to_raster, nchar(new_path_to_raster) - 29, nchar(new_path_to_raster))))
+    r <- rast(new_path_to_raster)
+    print(paste("Pulled", substr(new_path_to_raster, nchar(new_path_to_raster) - 29, nchar(new_path_to_raster))))
+  } else {
+    print(paste("Pulled", substr(path_to_raster, nchar(path_to_raster) - 29, nchar(path_to_raster))))
+  }
   
   # round raster values to 1 decimal place to capture those between 0-0.1, or else they'll all be rounded to 0 since as.polygons() outputs the nearest integer
   r_rounded <- round(r, 1)*10
@@ -117,7 +135,24 @@ raster2vector_season <- function() {
     "/sfav2_CONUS_", season_start, "_to_", season_end, ".tif")
   
   # load the raster
-  r <- rast(path_to_raster)
+  #r <- rast(path_to_raster)
+  r <- try(rast(path_to_raster), silent = TRUE)
+  
+  # Check if path_to_raster hits 404 error because it hasn't been created yet.
+  if (inherits(r, "try-error")) {
+    #Create path to one day behind the version just tried (1/28/25 instead of 1/29/25, etc.)
+    new_path_to_raster <- paste0(
+      "https://www.nohrsc.noaa.gov/snowfall/data/",
+      format(Sys.Date()-days(1), "%Y%m"), 
+      "/sfav2_CONUS_", season_start, "_to_", 
+      format(ymd(substr(season_end, 1, 8))-days(1), "%Y%m%d"), "12", ".tif")
+    print(paste(substr(path_to_raster, nchar(path_to_raster) - 39, nchar(path_to_raster)), "is unavailable."))
+    print(paste("Now trying", substr(new_path_to_raster, nchar(new_path_to_raster) - 39, nchar(new_path_to_raster))))
+    r <- rast(new_path_to_raster)
+    print(paste("Pulled", substr(new_path_to_raster, nchar(new_path_to_raster) - 39, nchar(new_path_to_raster))))
+  } else {
+    print(paste("Pulled", substr(path_to_raster, nchar(path_to_raster) - 39, nchar(path_to_raster))))
+  }
   
   # round raster values to 1 decimal place to capture those between 0-0.1, or else they'll all be rounded to 0 since as.polygons() outputs the nearest integer
   r_rounded <- round(r, 1)*10
@@ -127,7 +162,7 @@ raster2vector_season <- function() {
   
   # convert raster polygons to sf
   r_poly_sf <- st_as_sf(r_poly)
-  
+
   # define the breaks and colors, different from 24/48/72h scale
   breaks <- c(-0.01, 0, 0.1, 1, 2, 6, 
               # NOAA's scale has them in ft, multiplying by 12:
@@ -188,7 +223,7 @@ timeframes <- c(timeframes, "season_")
 
 # get some additional info for the chatter
 ocr_text <- function(timeframe){
-  
+  #timeframe = "season_"
   # make a url dynamically
   if (timeframe == "season_") {
     # first get current year
@@ -205,6 +240,7 @@ ocr_text <- function(timeframe){
     
     # define the end of the season as the current date
     season_end <- paste0(format(Sys.Date(), "%Y%m%d"), "12") # hour fixed, no "00" files
+    #season_end <- "2025013012"
     
     # connect all this for seasonal URL
     path_to_image <- paste0(
@@ -214,17 +250,56 @@ ocr_text <- function(timeframe){
   } else {
     path_to_image <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", format(Sys.Date(), "%Y%m"), "/sfav2_CONUS_", timeframe, format(Sys.Date(), "%Y%m%d"), hour, ".png")
   }
-    
   
+  #print (paste("Trying", path_to_image))
   # extract text
   # make it all caps, since sometimes it reads "issued" and sometimes "Issued" - this helps subsetting later
-  text <- tesseract::ocr(path_to_image) %>% toupper()
+  #text <- tesseract::ocr(path_to_image) %>% toupper()
+  text <- try(tesseract::ocr(path_to_image) %>% toupper())
   
+  # Check if path_to_image for season hits 404 error because it hasn't been created yet.
+  if (inherits(text, "try-error") && timeframe == "season_") {
+    #Create path to one day behind the version just tried (1/28/25 instead of 1/29/25, etc.)
+    new_path_to_image <- paste0(
+      "https://www.nohrsc.noaa.gov/snowfall/data/",
+      format(Sys.Date()-days(1), "%Y%m"), 
+      "/sfav2_CONUS_", season_start, "_to_", 
+      format(ymd(substr(season_end, 1, 8))-days(1), "%Y%m%d"), "12", ".png")
+    print(paste(substr(path_to_image, nchar(path_to_image) - 39, nchar(path_to_image)), "is unavailable."))
+    print(paste("Now trying", substr(new_path_to_image, nchar(new_path_to_image) - 39, nchar(new_path_to_image))))
+    
+    text <- tesseract::ocr(new_path_to_image) %>% toupper()
+    print(paste("Pulled", substr(new_path_to_image, nchar(new_path_to_image) - 39, nchar(new_path_to_image))))
+  } 
+  
+  # Check if path_to_image for other three timeframse hits 404 error because it hasn't been created yet.
+  if (inherits(text, "try-error") && timeframe != "season_") {
+    new_path_to_image <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", 
+                                if_else (hour==12, format(Sys.Date(), "%Y%m"), format(Sys.Date()-days(1), "%Y%m")), 
+                                "/sfav2_CONUS_", timeframe, 
+                                if_else (hour==12, format(Sys.Date(), "%Y%m%d"), format(Sys.Date()-days(1), "%Y%m%d")), 
+                                if_else (hour==12, "00", "12"), ".png")
+    
+    print(paste(substr(path_to_image, nchar(path_to_image) - 29, nchar(path_to_image)), "is unavailable."))
+    print(paste("Now trying", substr(new_path_to_image, nchar(new_path_to_image) - 29, nchar(new_path_to_image))))
+    
+    text <- tesseract::ocr(new_path_to_image) %>% toupper()
+    print(paste("Pulled", substr(new_path_to_image, nchar(new_path_to_image) - 29, nchar(new_path_to_image))))
+  } 
+  
+  # Print output if no error encountered.
+  if (!inherits(text, "try-error") && timeframe == "season_") {
+    print(paste("Pulled", substr(path_to_image, nchar(path_to_image) - 39, nchar(path_to_image))))
+  } 
+  if (!inherits(text, "try-error") && timeframe != "season_") {
+    print(paste("Pulled", substr(path_to_image, nchar(path_to_image) - 29, nchar(path_to_image))))
+  }
+
   # get the hour data was updated
-  data_updated <- ymd_hms(str_extract(text, "(?<=ISSUED\\s).*?UTC"))
+  #data_updated <- ymd_hms(str_extract(text, "(?<=ISSUED\\s).*?UTC"))
+  data_updated <-str_extract(text, "(?<=ISSUED\\s).*?UTC")
   
   return(data_updated)
-  
 }
 
 # iterate the function for 24hr/48hr/72hr/season accumulations to get last updated data from .png
@@ -255,3 +330,8 @@ save_files2 <- function(x){
                             overwrite = TRUE)
 }
 lapply (1:length(timeframes), save_files2)
+
+#Save last updated times to JSON
+ocr_times <- ocr_list %>% unlist()
+last_updated <- tibble(timeframe = str_remove_all(timeframes, "_"), last_updated=ocr_times) 
+write_json(last_updated, "outputs/last_updated.json")

@@ -31,4 +31,13 @@ gcs_file_paths = [f"snowfall-accumulation/{timeframe}_snow_accumulation_latest.j
 for file_path, gcs_path in zip(file_paths, gcs_file_paths):
     upload_to_gcs(file_path, bucket_name, gcs_path)
     print(f"Uploaded {file_path} to Google Cloud Storage.")
+
+# Upload last updated JSON to GCS
+local_file_path = "outputs/last_updated.json"
+bucket_name = "your-life-in-data"
+gcs_file_path = "snowfall-accumulation/last_updated.json"
+upload_to_gcs(local_file_path, bucket_name, gcs_file_path)
+print(f"Uploaded {local_file_path} to Google Cloud Storage.")
+
 # %%
+
