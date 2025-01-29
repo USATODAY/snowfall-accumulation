@@ -224,7 +224,7 @@ timeframes <- c(timeframes, "season_")
 
 # get some additional info for the chatter
 ocr_text <- function(timeframe){
-  #timeframe = "season_"
+  #timeframe = "24h_"
   # make a url dynamically
   if (timeframe == "season_") {
     # first get current year
@@ -259,41 +259,41 @@ ocr_text <- function(timeframe){
   text <- try(tesseract::ocr(path_to_image) %>% toupper())
   
   # Check if path_to_image for season hits 404 error because it hasn't been created yet.
-  if (inherits(text, "try-error") && timeframe == "season_") {
-    #Create path to one day behind the version just tried (1/28/25 instead of 1/29/25, etc.)
-    new_path_to_image <- paste0(
-      "https://www.nohrsc.noaa.gov/snowfall/data/",
-      format(Sys.Date()-days(1), "%Y%m"), 
-      "/sfav2_CONUS_", season_start, "_to_", 
-      format(ymd(substr(season_end, 1, 8))-days(1), "%Y%m%d"), "12", ".png")
-    print(paste(substr(path_to_image, nchar(path_to_image) - 39, nchar(path_to_image)), "is unavailable."))
-    print(paste("Now trying", substr(new_path_to_image, nchar(new_path_to_image) - 39, nchar(new_path_to_image))))
-    
-    text <- tesseract::ocr(new_path_to_image) %>% toupper()
-    print(paste("Pulled", substr(new_path_to_image, nchar(new_path_to_image) - 39, nchar(new_path_to_image))))
-  } 
+  if (timeframe == "season_"){
+    if (inherits(text, "try-error")) {
+      #Create path to one day behind the version just tried (1/28/25 instead of 1/29/25, etc.)
+      new_path_to_image <- paste0(
+        "https://www.nohrsc.noaa.gov/snowfall/data/",
+        format(Sys.Date()-days(1), "%Y%m"), 
+        "/sfav2_CONUS_", season_start, "_to_", 
+        format(ymd(substr(season_end, 1, 8))-days(1), "%Y%m%d"), "12", ".png")
+      print(paste(substr(path_to_image, nchar(path_to_image) - 39, nchar(path_to_image)), "is unavailable."))
+      print(paste("Now trying", substr(new_path_to_image, nchar(new_path_to_image) - 39, nchar(new_path_to_image))))
+      
+      text <- tesseract::ocr(new_path_to_image) %>% toupper()
+      print(paste("Pulled", substr(new_path_to_image, nchar(new_path_to_image) - 39, nchar(new_path_to_image))))
+    } else {
+      print(paste("Pulled", substr(path_to_image, nchar(path_to_image) - 39, nchar(path_to_image))))
+    }
+  }
   
-  # Check if path_to_image for other three timeframse hits 404 error because it hasn't been created yet.
-  if (inherits(text, "try-error") && timeframe != "season_") {
-    new_path_to_image <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", 
-                                if_else (hour==12, format(Sys.Date(), "%Y%m"), format(Sys.Date()-days(1), "%Y%m")), 
-                                "/sfav2_CONUS_", timeframe, 
-                                if_else (hour==12, format(Sys.Date(), "%Y%m%d"), format(Sys.Date()-days(1), "%Y%m%d")), 
-                                if_else (hour==12, "00", "12"), ".png")
-    
-    print(paste(substr(path_to_image, nchar(path_to_image) - 29, nchar(path_to_image)), "is unavailable."))
-    print(paste("Now trying", substr(new_path_to_image, nchar(new_path_to_image) - 29, nchar(new_path_to_image))))
-    
-    text <- tesseract::ocr(new_path_to_image) %>% toupper()
-    print(paste("Pulled", substr(new_path_to_image, nchar(new_path_to_image) - 29, nchar(new_path_to_image))))
-  } 
-  
-  # Print output if no error encountered.
-  if (!inherits(text, "try-error") && timeframe == "season_") {
-    print(paste("Pulled", substr(path_to_image, nchar(path_to_image) - 39, nchar(path_to_image))))
-  } 
-  if (!inherits(text, "try-error") && timeframe != "season_") {
-    print(paste("Pulled", substr(path_to_image, nchar(path_to_image) - 29, nchar(path_to_image))))
+  # Check if path_to_image for other three timeframes hits 404 error because it hasn't been created yet.
+  if (timeframe != "season_"){
+    if (inherits(text, "try-error")) {
+      new_path_to_image <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", 
+                                  if_else (hour==12, format(Sys.Date(), "%Y%m"), format(Sys.Date()-days(1), "%Y%m")), 
+                                  "/sfav2_CONUS_", timeframe, 
+                                  if_else (hour==12, format(Sys.Date(), "%Y%m%d"), format(Sys.Date()-days(1), "%Y%m%d")), 
+                                  if_else (hour==12, "00", "12"), ".png")
+      
+      print(paste(substr(path_to_image, nchar(path_to_image) - 29, nchar(path_to_image)), "is unavailable."))
+      print(paste("Now trying", substr(new_path_to_image, nchar(new_path_to_image) - 29, nchar(new_path_to_image))))
+      
+      text <- tesseract::ocr(new_path_to_image) %>% toupper()
+      print(paste("Pulled", substr(new_path_to_image, nchar(new_path_to_image) - 29, nchar(new_path_to_image))))
+    } else {
+      print(paste("Pulled", substr(path_to_image, nchar(path_to_image) - 29, nchar(path_to_image))))
+    }
   }
 
   # get the hour data was updated
