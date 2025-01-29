@@ -7,6 +7,7 @@ library(tesseract)
 library(lubridate)
 library(tidyr)
 library(jsonlite)
+library(tibble)
 
 #SOURCE: https://www.nohrsc.noaa.gov/snowfall/
 
@@ -305,6 +306,14 @@ ocr_text <- function(timeframe){
 # iterate the function for 24hr/48hr/72hr/season accumulations to get last updated data from .png
 ocr_list <- lapply(timeframes, ocr_text)
 
+#Save last updated times to JSON
+ocr_times <- ocr_list %>% unlist()
+last_updated <- tibble(timeframe = str_remove_all(timeframes, "_"), last_updated=ocr_times) 
+write_json(last_updated, "outputs/last_updated.json")
+
+#Convert list to dates for saving properly
+ocr_list <- lapply(ocr_list, ymd_hms)
+
 #Save as GeoJSON using updated time.
 #save_files <- function(x){
 #  st_write (snow_list[[x]], paste0("outputs/", substr(timeframes[x], 1,3), "/", format(Sys.Date(), "%Y%m%d"), hour, "_", format(ocr_list[[x]], "%H%M%S"), "_", timeframes[x], "snow_accumulation.geojson"), append=FALSE)
@@ -330,8 +339,3 @@ save_files2 <- function(x){
                             overwrite = TRUE)
 }
 lapply (1:length(timeframes), save_files2)
-
-#Save last updated times to JSON
-ocr_times <- ocr_list %>% unlist()
-last_updated <- tibble(timeframe = str_remove_all(timeframes, "_"), last_updated=ocr_times) 
-write_json(last_updated, "outputs/last_updated.json")
