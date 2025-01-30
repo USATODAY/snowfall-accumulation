@@ -13,7 +13,7 @@ library(tibble)
 
 #Set time zone to pull files using Eastern time so GitHub Actions doesn't use UTC.
 #Sys.setenv(TZ="America/New_York")
-Sys.setenv(TZ="UTC")
+#Sys.setenv(TZ="UTC")
 
 # Form path to URL: First, check the time and output 12 or 00 -- use 12 after 1 p.m. UTC. Otherwise, use 00.
 hour <- if (as.numeric(format(Sys.time(), "%H")) >= 13 && as.numeric(format(Sys.time(), "%H")) < 24) {
@@ -27,7 +27,7 @@ timeframes <- c("24h_", "48h_", "72h_")
 # we'll make a function to get and process the latest raster 
 raster2vector <- function(timeframe){
   
-  #timeframe <- "72h_"
+  #timeframe <- "24h_"
   # make a url
   path_to_raster <- paste0("https://www.nohrsc.noaa.gov/snowfall/data/", format(Sys.Date(), "%Y%m"), "/sfav2_CONUS_", timeframe, format(Sys.Date(), "%Y%m%d"), hour, ".tif")
   
@@ -47,8 +47,13 @@ raster2vector <- function(timeframe){
     print(paste("Now trying", substr(new_path_to_raster, nchar(new_path_to_raster) - 29, nchar(new_path_to_raster))))
     r <- rast(new_path_to_raster)
     print(paste("Pulled", substr(new_path_to_raster, nchar(new_path_to_raster) - 29, nchar(new_path_to_raster))))
+    #Set column name to previous version
+    column_name <- paste0("sfav2_CONUS_", timeframe, if_else (hour==12, format(Sys.Date(), "%Y%m%d"), format(Sys.Date()-days(1), "%Y%m%d")), 
+                          if_else (hour==12, "00", "12"))
   } else {
     print(paste("Pulled", substr(path_to_raster, nchar(path_to_raster) - 29, nchar(path_to_raster))))
+    #Use current version of column name
+    column_name <- paste0("sfav2_CONUS_", timeframe, format(Sys.Date(), "%Y%m%d"), hour)
   }
   
   # round raster values to 1 decimal place to capture those between 0-0.1, or else they'll all be rounded to 0 since as.polygons() outputs the nearest integer
@@ -81,8 +86,8 @@ raster2vector <- function(timeframe){
               "24", "30", "36", "48", "60", 
               "72", "96", "120", ">120")
   
-  # form what the column name should be 
-  column_name <- paste0("sfav2_CONUS_", timeframe, format(Sys.Date(), "%Y%m%d"), hour)
+  # form what the column name should be -- moved up so can be fixed by error handling
+  #column_name <- paste0("sfav2_CONUS_", timeframe, format(Sys.Date(), "%Y%m%d"), hour)
   
   # assign color categories based on the breaks
   r_poly_sf$color_factor <- cut(r_poly_sf[[column_name]],
@@ -156,8 +161,11 @@ raster2vector_season <- function() {
     print(paste("Now trying", substr(new_path_to_raster, nchar(new_path_to_raster) - 39, nchar(new_path_to_raster))))
     r <- rast(new_path_to_raster)
     print(paste("Pulled", substr(new_path_to_raster, nchar(new_path_to_raster) - 39, nchar(new_path_to_raster))))
+    
+    column_name <- paste0("sfav2_CONUS_", season_start, "_to_", format(ymd(substr(season_end, 1, 8))-days(1), "%Y%m%d"), "12")
   } else {
     print(paste("Pulled", substr(path_to_raster, nchar(path_to_raster) - 39, nchar(path_to_raster))))
+    column_name <- paste0("sfav2_CONUS_", season_start, "_to_", season_end)
   }
   
   # round raster values to 1 decimal place to capture those between 0-0.1, or else they'll all be rounded to 0 since as.polygons() outputs the nearest integer
@@ -205,7 +213,7 @@ raster2vector_season <- function() {
                "> 30 ft")
   
   # form what the column name should be 
-  column_name <- paste0("sfav2_CONUS_", season_start, "_to_", season_end)
+  #column_name <- paste0("sfav2_CONUS_", season_start, "_to_", season_end)
   
   # assign color categories based on the breaks we've defined for USAT
   r_poly_sf$color_factor <- cut(r_poly_sf[[column_name]],
