@@ -24,3 +24,14 @@ jobs:
 
       - name: Run Mapshaper Command
         run: mapshaper outputs/input.json -o precision=0.1 outputs/snowfall.json  # Run your Mapshaper command directly
+
+      - name: Commit results
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add --all
+          git commit -m "Latest data: $(date)" || exit 0
+          git push 
+        env:
+          REPO_KEY: ${{secrets.GITHUB_TOKEN}}
+          username: github-actions
