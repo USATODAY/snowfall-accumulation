@@ -26,10 +26,10 @@ jobs:
             any::stringr
             any::tesseract
             any::lubridate 
-            any::tidyr
             any::geojsonio
             any::tibble
             any::jsonlite
+            any::stars
       
       #Added to try caching to save time.      
       - name: Cache R packages
@@ -44,7 +44,7 @@ jobs:
 
       - name: Scrape latest snowfall raster data for 24h, 48h, 72h, and season
         #run: Rscript -e 'source("250127-SnowfallPolygons.R")'
-        run: Rscript -e 'source("250129-SnowfallPolygons_season.R")' #run all four timeframes
+        run: Rscript -e 'source("250130-SnowfallPolygons_season.R")' #run all four timeframes
         
       - name: Commit results
         run: |
@@ -56,12 +56,21 @@ jobs:
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
-          
-      - name: Trigger push to Google Cloud
+
+      - name: Trigger mapshaper workflow
         if: success()
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
           repository: ${{ github.repository }}
-          event-type: trigger-workflow-2
-          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          event-type: trigger-mapshaper
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'          
+
+#      - name: Trigger push to Google Cloud
+#        if: success()
+#        uses: peter-evans/repository-dispatch@v1
+#        with:
+#          token: ${{ secrets.REPO_GHA_PAT }}
+#          repository: ${{ github.repository }}
+#          event-type: trigger-workflow-2 #trigger-push-to-gcp
+#          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

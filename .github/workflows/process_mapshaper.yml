@@ -1,6 +1,8 @@
 name: Process with Mapshaper
 
 on:
+  repository_dispatch:
+    types: [trigger-mapshaper]
   workflow_dispatch:
   #push:
   #  branches:
@@ -23,7 +25,7 @@ jobs:
         run: npm install -g mapshaper  # Install Mapshaper globally
 
       - name: Run Mapshaper Command
-        run: mapshaper outputs/input.json -o precision=0.1 outputs/snowfall.json  # Run your Mapshaper command directly
+        run: mapshaper outputs/season/season_inches_snow_accumulation_latest_full.json -o precision=0.1 outputs/season/season_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
 
       - name: Commit results
         run: |
@@ -35,3 +37,12 @@ jobs:
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
+
+      - name: Trigger push to Google Cloud
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-push-to-gcp
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

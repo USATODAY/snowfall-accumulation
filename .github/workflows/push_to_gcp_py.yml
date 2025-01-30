@@ -2,7 +2,7 @@ name: Upload to GCP
 
 on:
   repository_dispatch:
-    types: [trigger-workflow-2]
+    types: [trigger-push-to-gcp]
   workflow_dispatch:
   #push:
   #  branches:
