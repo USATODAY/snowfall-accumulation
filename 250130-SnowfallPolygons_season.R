@@ -431,16 +431,16 @@ ocr_list <- lapply(ocr_list, ymd_hms)
 save_files1 <- function(x){
   #geojsonio::topojson_write(snow_list, 
   geojsonio::topojson_write(snow_list[[x]], 
-                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "inches_snow_accumulation_latest.json"),
+                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "inches_snow_accumulation_latest_full.json"),
                             object_name = "snowfall",
                             overwrite = TRUE)
 }
-lapply (1:3, save_files1)
+lapply (1:4, save_files1)
 #save season separately
-geojsonio::topojson_write(snow_list[[4]], 
-                          file = paste0("outputs/season/season_inches_snow_accumulation_latest_full.json"),
-                          object_name = "snowfall",
-                          overwrite = TRUE)
+#geojsonio::topojson_write(snow_list[[4]], 
+#                          file = paste0("outputs/season/season_inches_snow_accumulation_latest_full.json"),
+#                          object_name = "snowfall",
+#                          overwrite = TRUE)
 
 #Save as TopoJSON using updated time to maintain record.
 save_files2 <- function(x){

@@ -25,13 +25,13 @@ jobs:
         run: npm install -g mapshaper  # Install Mapshaper globally
 
       - name: Run Mapshaper-24h
-        run: mapshaper outputs/24h/24h_inches_snow_accumulation_latest.json -o precision=0.1 outputs/24h/24h_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
+        run: mapshaper outputs/24h/24h_inches_snow_accumulation_latest_full.json -o precision=0.1 outputs/24h/24h_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
         
       - name: Run Mapshaper-48h
-        run: mapshaper outputs/48h/48h_inches_snow_accumulation_latest.json -o precision=0.1 outputs/48h/48h_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
+        run: mapshaper outputs/48h/48h_inches_snow_accumulation_latest_full.json -o precision=0.1 outputs/48h/48h_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
 
       - name: Run Mapshaper-72h
-        run: mapshaper outputs/72h/72h_inches_snow_accumulation_latest.json -o precision=0.1 outputs/72h/72h_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
+        run: mapshaper outputs/72h/72h_inches_snow_accumulation_latest_full.json -o precision=0.1 outputs/72h/72h_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
 
       - name: Run Mapshaper-season
         run: mapshaper outputs/season/season_inches_snow_accumulation_latest_full.json -o precision=0.1 outputs/season/season_inches_snow_accumulation_latest.json  # Run your Mapshaper command directly
