@@ -110,7 +110,7 @@ raster2vector <- function(timeframe){
     mutate (accumulation = case_when(
     get(column_name) < 0 ~ -1,
     get(column_name) == 0 ~ 0,
-    between(column_name, 0, 0.1) ~ 0.1, #anything below 0.1" rounds up to 0.1"
+    between(get(column_name), 0, 0.1) ~ 0.1, #anything below 0.1" rounds up to 0.1"
     TRUE ~ round(get(column_name), 1))) #round everything else to nearest 1/10"
   
   #check <- r_poly3 %>% st_drop_geometry() 
