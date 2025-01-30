@@ -103,7 +103,7 @@ raster2vector <- function(timeframe){
     print (paste("Using column:", column_name))
     
   # Convert raster to polygons
-  r_poly2 <- st_as_sf(r, merge = TRUE)  # Merge adjacent areas of same value
+  #r_poly2 <- st_as_sf(r, merge = TRUE)  # Merge adjacent areas of same value
   
   # Round to the nearest tenth of an inch.
   # r_poly3 <- r_poly2 %>%
@@ -114,22 +114,36 @@ raster2vector <- function(timeframe){
   #   TRUE ~ round(get(column_name), 1))) #round everything else to nearest 1/10"
   # 
 # Round to the nearest half inch.
+  # r_poly3 <- r_poly2 %>%
+  #   mutate (accumulation = case_when(
+  #     get(column_name) < 0 ~ -1,
+  #     get(column_name) == 0 ~ 0,
+  #     between(get(column_name), 0, 0.5) ~ 0.5, #anything below 0.25" rounds up to 0.5"
+  #     TRUE ~ ceiling(get(column_name) * 2) / 2))  # Round to nearest 0.5"
+  # 
+  # Convert raster to polygons
+  r_poly2 <- st_as_sf(r) %>%
+    filter (get(column_name) > 0) %>% #remove NAs and 0
+    rename (accumulation = column_name)
+  
+  # Round to the nearest inch.
   r_poly3 <- r_poly2 %>%
     mutate (accumulation = case_when(
-      get(column_name) < 0 ~ -1,
-      get(column_name) == 0 ~ 0,
-      between(get(column_name), 0, 0.5) ~ 0.5, #anything below 0.25" rounds up to 0.5"
-      TRUE ~ ceiling(get(column_name) * 2) / 2))  # Round to nearest 0.5"
+      #accumulation< 0 ~ -1,
+      #accumulation == 0 ~ 0,
+      between(accumulation, 0, 0.1) ~ 0.1, #trace amounts round to 0.1
+      between(accumulation, 0.1, 0.99) ~ 1, #round 0.1-0.4 up to 1
+      TRUE ~ round(accumulation)))
   
   #check <- r_poly3 %>% st_drop_geometry() 
   #check2 <- check %>% count (accumulation)
   
   r_poly_sf2 <- r_poly3  %>%
-    filter (accumulation > 0) %>%
+    #filter (accumulation > 0) %>%
     group_by (accumulation) %>%
     summarize (geometry=st_union(geometry)) %>%
     st_make_valid()
-  #check3 <- r_poly4 %>% st_drop_geometry()
+  check3 <- r_poly_sf2 %>% st_drop_geometry()
   }
   
   return(r_poly_sf2)
@@ -441,17 +455,17 @@ ocr_list <- lapply(ocr_list, ymd_hms)
 save_files1 <- function(x){
   #geojsonio::topojson_write(snow_list, 
   geojsonio::topojson_write(snow_list[[x]], 
-                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "inches_snow_accumulation_latest.json"),
+                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "inches_snow_accumulation_latest_full.json"),
                             #file = paste0("outputs/test/", timeframes[x], "inches_snow_accumulation_latest_full.json"),
                             object_name = "snowfall",
                             overwrite = TRUE)
 }
-lapply (1:3, save_files1)
+lapply (1:4, save_files1)
 #save season separately
-geojsonio::topojson_write(snow_list[[4]], 
-                          file = paste0("outputs/season/season_inches_snow_accumulation_latest_full.json"),
-                          object_name = "snowfall",
-                          overwrite = TRUE)
+# geojsonio::topojson_write(snow_list[[4]], 
+#                           file = paste0("outputs/season/season_inches_snow_accumulation_latest_full.json"),
+#                           object_name = "snowfall",
+#                           overwrite = TRUE)
 
 #Save as TopoJSON using updated time to maintain record.
 save_files2 <- function(x){

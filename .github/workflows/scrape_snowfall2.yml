@@ -63,7 +63,7 @@ jobs:
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
           repository: ${{ github.repository }}
-          event-type: trigger-mapshaper
+          event-type: trigger-mapshaper-all
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'          
 
 #      - name: Trigger push to Google Cloud
