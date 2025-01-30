@@ -56,6 +56,8 @@ raster2vector <- function(timeframe){
     column_name <- paste0("sfav2_CONUS_", timeframe, format(Sys.Date(), "%Y%m%d"), hour)
   }
   
+  print (paste("Using column:", column_name))
+  
   # round raster values to 1 decimal place to capture those between 0-0.1, or else they'll all be rounded to 0 since as.polygons() outputs the nearest integer
   r_rounded <- round(r, 1)*10
   
@@ -161,12 +163,13 @@ raster2vector_season <- function() {
     print(paste("Now trying", substr(new_path_to_raster, nchar(new_path_to_raster) - 39, nchar(new_path_to_raster))))
     r <- rast(new_path_to_raster)
     print(paste("Pulled", substr(new_path_to_raster, nchar(new_path_to_raster) - 39, nchar(new_path_to_raster))))
-    
     column_name <- paste0("sfav2_CONUS_", season_start, "_to_", format(ymd(substr(season_end, 1, 8))-days(1), "%Y%m%d"), "12")
   } else {
     print(paste("Pulled", substr(path_to_raster, nchar(path_to_raster) - 39, nchar(path_to_raster))))
     column_name <- paste0("sfav2_CONUS_", season_start, "_to_", season_end)
   }
+  
+  print (paste("Using column:", column_name))
   
   # round raster values to 1 decimal place to capture those between 0-0.1, or else they'll all be rounded to 0 since as.polygons() outputs the nearest integer
   r_rounded <- round(r, 1)*10
