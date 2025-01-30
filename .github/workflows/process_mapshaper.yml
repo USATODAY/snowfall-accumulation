@@ -1,0 +1,36 @@
+name: Process with Mapshaper
+
+on:
+  workflow_dispatch:
+  #push:
+  #  branches:
+  #    - main  # Run on pushes to the main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Or macos-latest if you prefer
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Set the version of Node.js
+
+      - name: Install Mapshaper
+        run: npm install -g mapshaper  # Install Mapshaper globally
+
+      - name: Install R
+        uses: rocker/r-ver@v4.2.1  # Optional if you need a specific R version
+
+      - name: Install R dependencies
+        run: |
+          Rscript -e "install.packages('geojsonio')"
+          Rscript -e "install.packages('sf')"
+          Rscript -e "install.packages('rmapshaper')"
+
+      - name: Run R script
+        run: |
+          Rscript -e 'system(paste("mapshaper", "outputs/input.json", "-o precision=0.1", "outputs/output.json"))'
