@@ -1,8 +1,8 @@
-name: Process with Mapshaper
+name: Process with Mapshaper (all)
 
 on:
   repository_dispatch:
-    types: [trigger-mapshaper]
+    types: [trigger-mapshaper-all]
   workflow_dispatch:
   #push:
   #  branches:
