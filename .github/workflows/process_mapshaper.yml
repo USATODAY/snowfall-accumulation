@@ -22,15 +22,5 @@ jobs:
       - name: Install Mapshaper
         run: npm install -g mapshaper  # Install Mapshaper globally
 
-      - name: Install R
-        uses: rocker/r-ver@v4.2.1  # Optional if you need a specific R version
-
-      - name: Install R dependencies
-        run: |
-          Rscript -e "install.packages('geojsonio')"
-          Rscript -e "install.packages('sf')"
-          Rscript -e "install.packages('rmapshaper')"
-
-      - name: Run R script
-        run: |
-          Rscript -e 'system(paste("mapshaper", "outputs/input.json", "-o precision=0.1", "outputs/output.json"))'
+      - name: Run Mapshaper Command
+        run: mapshaper outputs/input.json -o precision=0.1 outputs/snowfall.json  # Run your Mapshaper command directly
