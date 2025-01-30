@@ -106,20 +106,29 @@ raster2vector <- function(timeframe){
   r_poly2 <- st_as_sf(r, merge = TRUE)  # Merge adjacent areas of same value
   
   # Round to the nearest tenth of an inch.
+  # r_poly3 <- r_poly2 %>%
+  #   mutate (accumulation = case_when(
+  #   get(column_name) < 0 ~ -1,
+  #   get(column_name) == 0 ~ 0,
+  #   between(get(column_name), 0, 0.1) ~ 0.1, #anything below 0.1" rounds up to 0.1"
+  #   TRUE ~ round(get(column_name), 1))) #round everything else to nearest 1/10"
+  # 
+# Round to the nearest half inch.
   r_poly3 <- r_poly2 %>%
     mutate (accumulation = case_when(
-    get(column_name) < 0 ~ -1,
-    get(column_name) == 0 ~ 0,
-    between(get(column_name), 0, 0.1) ~ 0.1, #anything below 0.1" rounds up to 0.1"
-    TRUE ~ round(get(column_name), 1))) #round everything else to nearest 1/10"
+      get(column_name) < 0 ~ -1,
+      get(column_name) == 0 ~ 0,
+      between(get(column_name), 0, 0.5) ~ 0.5, #anything below 0.25" rounds up to 0.5"
+      TRUE ~ ceiling(get(column_name) * 2) / 2))  # Round to nearest 0.5"
   
   #check <- r_poly3 %>% st_drop_geometry() 
   #check2 <- check %>% count (accumulation)
   
-  r_poly_sf2 <- r_poly3 %>%
+  r_poly_sf2 <- r_poly3  %>%
+    filter (accumulation > 0) %>%
     group_by (accumulation) %>%
     summarize (geometry=st_union(geometry)) %>%
-    filter (accumulation > 0)
+    st_make_valid()
   #check3 <- r_poly4 %>% st_drop_geometry()
   }
   
@@ -323,7 +332,8 @@ raster2vector_season <- function() {
   
   r_poly4 <- r_poly3 %>%
     group_by (accumulation) %>%
-    summarize (geometry=st_union(geometry))
+    summarize (geometry=st_union(geometry)) %>%
+    st_make_valid()
   
   return(r_poly4)
 }
@@ -431,16 +441,17 @@ ocr_list <- lapply(ocr_list, ymd_hms)
 save_files1 <- function(x){
   #geojsonio::topojson_write(snow_list, 
   geojsonio::topojson_write(snow_list[[x]], 
-                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "inches_snow_accumulation_latest_full.json"),
+                            file = paste0("outputs/", str_remove(timeframes[x], "_"), "/", timeframes[x], "inches_snow_accumulation_latest.json"),
+                            #file = paste0("outputs/test/", timeframes[x], "inches_snow_accumulation_latest_full.json"),
                             object_name = "snowfall",
                             overwrite = TRUE)
 }
-lapply (1:4, save_files1)
+lapply (1:3, save_files1)
 #save season separately
-#geojsonio::topojson_write(snow_list[[4]], 
-#                          file = paste0("outputs/season/season_inches_snow_accumulation_latest_full.json"),
-#                          object_name = "snowfall",
-#                          overwrite = TRUE)
+geojsonio::topojson_write(snow_list[[4]], 
+                          file = paste0("outputs/season/season_inches_snow_accumulation_latest_full.json"),
+                          object_name = "snowfall",
+                          overwrite = TRUE)
 
 #Save as TopoJSON using updated time to maintain record.
 save_files2 <- function(x){
