@@ -44,5 +44,5 @@ jobs:
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
           repository: ${{ github.repository }}
-          event-type: trigger-push-to-gcp
+          event-type: trigger-cleanup
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
