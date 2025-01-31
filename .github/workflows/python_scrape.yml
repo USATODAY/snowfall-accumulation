@@ -27,17 +27,23 @@ jobs:
       #    python -m pip install --upgrade pip
       #    pip install -r requirements.txt
       #    pip install osgeo  # Sometimes needed separately
-          
+    
       - name: Install system dependencies (GDAL)
         run: |
           sudo apt-get update
           sudo apt-get install -y gdal-bin libgdal-dev python3-gdal
           export CPLUS_INCLUDE_PATH=/usr/include/gdal
           export C_INCLUDE_PATH=/usr/include/gdal
+          echo "CPLUS_INCLUDE_PATH=/usr/include/gdal" >> $GITHUB_ENV
+          echo "C_INCLUDE_PATH=/usr/include/gdal" >> $GITHUB_ENV
+          echo "GDAL_DATA=/usr/share/gdal" >> $GITHUB_ENV
+          echo "PROJ_LIB=/usr/share/proj" >> $GITHUB_ENV
+          echo "PYTHONPATH=$(python3 -c 'import site; print(site.getsitepackages()[0])')" >> $GITHUB_ENV
 
       - name: Verify GDAL Installation
         run: |
           gdalinfo --version
+          python3 -c "import sys; print(sys.path)"
           python3 -c "from osgeo import gdal; print(gdal.VersionInfo())"
 
       - name: Install Python dependencies
