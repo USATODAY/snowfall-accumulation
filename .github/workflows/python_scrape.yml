@@ -1,4 +1,4 @@
-name: Python-Scrape 24h, 48h, 72h
+name: Python-Scrape recent snowfall
 
 on:
   #repository_dispatch:
@@ -19,14 +19,24 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev
+      #- name: Install system dependencies
+      #  run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev
+
+      #- name: Install Python dependencies
+      #  run: |
+      #    python -m pip install --upgrade pip
+      #    pip install -r requirements.txt
+      #    pip install osgeo  # Sometimes needed separately
+          
+      - name: Install system dependencies (GDAL)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gdal-bin libgdal-dev python3-gdal
 
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install osgeo  # Sometimes needed separately
           
       - name: Run script
         run: python PolygonizeRaster.py
@@ -41,3 +51,4 @@ jobs:
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
+          
