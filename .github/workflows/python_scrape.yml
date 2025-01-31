@@ -32,6 +32,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade setuptools wheel
+          pip install numpy
           pip install gdal==3.8.4.*  # This will install the Python bindings for GDAL
           #pip install pygdal=="$(gdal-config --version).*"
           #pip install pygdal==3.7.2.*
