@@ -8,7 +8,7 @@ on:
   #  branches:
   #    - main  # Trigger on pushes to the main branch
 jobs:
-  upload:
+  scrape:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

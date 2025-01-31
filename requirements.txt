@@ -3,4 +3,3 @@ numpy
 pandas
 geopandas
 topojson
-json  # (not needed, as it's part of Python's standard library)
