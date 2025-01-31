@@ -35,14 +35,18 @@ jobs:
           export CPLUS_INCLUDE_PATH=/usr/include/gdal
           export C_INCLUDE_PATH=/usr/include/gdal
 
-      - name: Upgrade pip and setuptools
+      - name: Verify GDAL Installation
+        run: |
+          gdalinfo --version
+          python3 -c "from osgeo import gdal; print(gdal.VersionInfo())"
+
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade setuptools wheel
+          pip install pygdal=="$(gdal-config --version).*"
+          pip install -r requirements.txt
 
-      - name: Install Python dependencies
-        run: pip install -r requirements.txt
-        
       - name: Run script
         run: python PolygonizeRaster.py
         
