@@ -22,6 +22,7 @@ jobs:
             any::sf
             any::geojsonio
             any::smoothr
+            any::dplyr
       
       #Added to try caching to save time.      
       - name: Cache R packages
