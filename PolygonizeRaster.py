@@ -61,10 +61,15 @@ def raster2vector(timeframe):
     data = srcband.ReadAsArray()
     
     # Read the data from the raster
-    data[(data > 0) & (data < 1)] = 1  # Set values greater than 0 and <= 0.5 to 1 to preserve.
+    #data[(data > 0) & (data < 1)] = 1  # Set values greater than 0 and <= 0.5 to 1 to preserve.
 
     # Add 1 to all other values
-    data[(data > 1)] += 1  # Add 1 to all values greater than 0.5. We'll need to subtract one later.
+    #data[(data > 1)] += 1  # Add 1 to all values greater than 0.5. We'll need to subtract one later.
+    
+    # Add 1 to all other values above 0.5
+    data[(data > 0.5)] += 1  # Add 1 to all values greater than 0.5. We'll need to subtract one later.
+    
+    data[(data > 0) & (data < 0.5)] = 1  # Set values greater than 0 and <= 0.5 to 1 to preserve.
     
     # Create a new raster to save the modified data
     driver = gdal.GetDriverByName("GTiff")
