@@ -149,9 +149,11 @@ raster2vector <- function(timeframe){
   return(r_poly_sf2)
 }
 
+#TURN THIS OFF FOR NOW AND ONLY RUN SEASON
 # iterate the function for 24hr, 48hr and 72hr accumulations
-snow_list <- lapply(timeframes, raster2vector)
-
+# snow_list <- lapply(timeframes, raster2vector)
+snow_list <- list(NULL, NULL, NULL)
+ 
 # also get season accumulation
 # it's a slightly different format so getting that separately
 raster2vector_season <- function() {
@@ -460,8 +462,10 @@ save_files1 <- function(x){
                             object_name = "snowfall",
                             overwrite = TRUE)
 }
-lapply (1:4, save_files1)
-#save season separately
+#lapply (1:length(timeframes), save_files1)
+#save season only
+lapply (4, save_files1)
+
 # geojsonio::topojson_write(snow_list[[4]], 
 #                           file = paste0("outputs/season/season_inches_snow_accumulation_latest_full.json"),
 #                           object_name = "snowfall",
@@ -474,4 +478,5 @@ save_files2 <- function(x){
                             object_name = "snowfall",
                             overwrite = TRUE)
 }
-lapply (1:length(timeframes), save_files2)
+#lapply (1:length(timeframes), save_files2)
+lapply (4, save_files2)
