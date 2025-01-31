@@ -43,6 +43,14 @@ jobs:
           python3 -c "import sys; print(sys.path)"
           #python3 -c "from osgeo import gdal; print(gdal.VersionInfo())"
           python -c "import osgeo; print(osgeo.__version__)"
+          
+      - name: Set up GDAL environment variables
+        run: |
+          export GDAL_DATA=$(gdal-config --datadir)
+          export LD_LIBRARY_PATH=$(gdal-config --libdir):$LD_LIBRARY_PATH
+          echo "GDAL_DATA=$GDAL_DATA"
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+        shell: bash
 
       - name: Run script
         run: python PolygonizeRaster.py
