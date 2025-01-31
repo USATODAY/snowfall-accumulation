@@ -1,8 +1,10 @@
 name: Scrape snowfall (all 4)
 
 on:
-  schedule:
-    - cron: '15 * * * *' # Run at quarter after every hour
+  repository_dispatch:
+    types: [trigger-season-scrape]
+  #schedule:
+    #- cron: '15 * * * *' # Run at quarter after every hour
     #- cron: '30 5 * * *' # Run at 12:30 a.m. EST 
     #- cron: '30 17 * * *' # Run at 12:30 p.m. EST 
   workflow_dispatch:
@@ -63,7 +65,8 @@ jobs:
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
           repository: ${{ github.repository }}
-          event-type: trigger-mapshaper-all
+          #event-type: trigger-mapshaper-all
+          event-type: trigger-mapshaper
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'          
 
 #      - name: Trigger push to Google Cloud

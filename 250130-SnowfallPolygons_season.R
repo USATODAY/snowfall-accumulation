@@ -143,7 +143,7 @@ raster2vector <- function(timeframe){
     group_by (accumulation) %>%
     summarize (geometry=st_union(geometry)) %>%
     st_make_valid()
-  check3 <- r_poly_sf2 %>% st_drop_geometry()
+  #check3 <- r_poly_sf2 %>% st_drop_geometry()
   }
   
   return(r_poly_sf2)

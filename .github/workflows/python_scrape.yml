@@ -1,10 +1,12 @@
 name: Python-Scrape recent snowfall
 
 on:
+  schedule:
+    - cron: '15 * * * *' # Run at quarter after every hour
   #repository_dispatch:
   #  types: [trigger-push-to-gcp]
-  #workflow_dispatch:
-  push:
+  workflow_dispatch:
+  #push:
   #  branches:
   #    - main  # Trigger on pushes to the main branch
 jobs:
@@ -32,7 +34,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --upgrade setuptools wheel
-          pip install numpy
+          pip install numpy #numpy has to be installed before gdal to work properly, per https://gis.stackexchange.com/questions/83138/cannot-import-gdal-array
           pip install gdal==3.8.4.*  # This will install the Python bindings for GDAL
           #pip install pygdal=="$(gdal-config --version).*"
           #pip install pygdal==3.7.2.*
@@ -66,3 +68,12 @@ jobs:
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
+          
+      - name: Trigger season scrape workflow
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-season-scrape
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'       

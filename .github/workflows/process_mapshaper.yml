@@ -47,7 +47,7 @@ jobs:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
 
-      - name: Trigger push to Google Cloud
+      - name: Trigger Cleanup workflow
         if: success()
         uses: peter-evans/repository-dispatch@v1
         with:
