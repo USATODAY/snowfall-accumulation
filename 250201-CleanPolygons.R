@@ -5,7 +5,7 @@ library(dplyr)
 library(parallel)
 library(data.table)
 
-timeframes <- c("24h", "48h", "72h")
+timeframes <- c("24h", "48h", "72h", "season")
 
 lapply(1:3, function (x){
   #x=1
