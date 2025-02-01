@@ -33,7 +33,7 @@ jobs:
             
       - name: Install R packages
         run: |
-        Rscript -e 'install.packages(c("parallel", "sf", "geojsonio", "smoothr", "dplyr", "data.table"))'
+          Rscript -e 'install.packages(c("parallel", "sf", "geojsonio", "smoothr", "dplyr", "data.table"))'
       
       #Added to try caching to save time.      
       - name: Cache R packages
