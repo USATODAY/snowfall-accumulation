@@ -7,6 +7,7 @@ import geopandas as gpd
 import pandas as pd
 import topojson
 import json
+import requests
 
 def raster2vector(timeframe):
     # Get the current hour in UTC (12 after 1 p.m., otherwise 00)
@@ -21,6 +22,30 @@ def raster2vector(timeframe):
     path_to_raster = f"https://www.nohrsc.noaa.gov/snowfall/data/{month_str}/sfav2_CONUS_{timeframe}{date_str}{hour}.tif"
     out_path = f'python/{timeframe}snowfall.shp'
 
+    response = requests.head(path_to_raster)  # Send a HEAD request to check if the file exists
+
+    if response.status_code == 404:
+        # Create a path for the previous day if the file is not available
+        new_date = (datetime.strptime(season_end[:8], "%Y%m%d") - timedelta(days=1)).strftime("%Y%m%d")
+        new_path_to_raster = f"https://www.nohrsc.noaa.gov/snowfall/data/{datetime.now().strftime('%Y%m')}/sfav2_CONUS_{season_start}_to_{new_date}12.tif"
+    
+        print(f"{path_to_raster[-39:]} is unavailable.")
+        print(f"Now trying {new_path_to_raster[-39:]}")
+    
+        try:
+            #r = gpd.read_file(new_path_to_raster)
+            src_ds = gdal.Open(new_path_to_raster)
+            print(f"Pulled {new_path_to_raster[-39:]}")
+            #column_name = f"sfav2_CONUS_{timeframe}{new_date}{new_hour}.tif"
+        except Exception as e:
+            print(f"Error fetching data from {new_path_to_raster}: {e}")
+    else:
+        src_ds = gdal.Open(path_to_raster)
+        #src_ds = gdal.Open(path_to_raster)
+        print(f"Pulled {path_to_raster[-39:]}")
+        #column_name = f"sfav2_CONUS_{timeframe}{date_str}{hour}.tif"
+
+    '''ORIG CODE
     # Try to load the raster (if fails, load the previous day's version)
     try:
         #r = gpd.read_file(path_to_raster)  # Assuming the raster is in a format geopandas can read
@@ -52,7 +77,7 @@ def raster2vector(timeframe):
     else:
         print(f"Pulled {path_to_raster[-29:]}")
         #column_name = f"sfav2_CONUS_{timeframe}{date_str}{hour}.tif"
-    
+    '''   
     #print(f"Using column: {column_name}")
     # Read the first band (assuming the data is in the first band)
     srcband = src_ds.GetRasterBand(1)
