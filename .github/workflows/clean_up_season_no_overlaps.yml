@@ -1,8 +1,8 @@
-name: Clean up season (w/o overlaps)
+name: Clean up season (overlaps)
 
 on:
   repository_dispatch:
-    types: [trigger-cleanup-no-overlaps]
+    types: [trigger-cleanup-w-overlaps]
   workflow_dispatch:
   #push:
   #  branches:
@@ -15,25 +15,14 @@ jobs:
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudunits2-dev libgdal-dev libgeos-dev libproj-dev
-      
-#      - name: Install packages
-#        uses: r-lib/actions/setup-r-dependencies@v2
-#        with:
-#          packages: |
-#            any::parallel
-#            any::sf
-#            any::geojsonio
-#            any::smoothr
-#            any::dplyr
-#            any::data.table
-            
-      - name: Install R packages
-        run: |
-          Rscript -e 'install.packages(c("parallel", "sf", "geojsonio", "smoothr", "dplyr", "data.table"))'
+      - name: Install packages
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            any::sf
+            any::geojsonio
+            any::smoothr
+            any::dplyr
       
       #Added to try caching to save time.      
       - name: Cache R packages
@@ -48,8 +37,7 @@ jobs:
 
       - name: Run smoothr on day timeframes and compress season
         #run: Rscript -e 'source("250130-FixSeason.R")' #run all four timeframes
-        #run: Rscript -e 'source("250131-CleanPolygons.R")' #add smoothr
-        run: Rscript -e 'source("250201-CleanPolygons.R")' #also remove overlapping bits
+        run: Rscript -e 'source("250131-CleanPolygons.R")' 
         
       - name: Commit results
         run: |

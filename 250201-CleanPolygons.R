@@ -49,7 +49,8 @@ lapply(1:3, function (x){
     st_make_valid() %>%
     arrange(desc(area), desc(accumulation)) #%>%
   
-  # file3 <- paste0("outputs/", timeframe, "/", timeframe, "_inches_snow_accumulation_latest.json")
+  #file3 <- paste0("outputs/", timeframe, "/", timeframe, "_inches_snow_accumulation_latest.json")
+  #smoothed_polygons6 <- st_read (file3)
   # 
   # geojsonio::topojson_write(smoothed_polygons6, 
   #                           file = file3,
@@ -58,28 +59,55 @@ lapply(1:3, function (x){
 # })
 
   #Remove overlapping bits for smooth appearance on Mapbox
-  smoothed_polygons7 <- parallel::mclapply(1:nrow(smoothed_polygons6), function(x){
-    #smoothed_polygons7 <- parallel::mclapply(1:100, function(x){
-    #x=53
-    this_feature <- smoothed_polygons6[x,]
-    intersections = st_intersects(x = smoothed_polygons6, y = smoothed_polygons6[x,])
-    intersections_log = lengths(intersections) > 0
-    smoothed_polygons6a = smoothed_polygons6[intersections_log, ] %>%
-      #filter (id != this_feature$id)# %>% 
-      #remove any that are larger (meaning id is lower value)
-      filter (id > this_feature$id) 
-    
-    if (nrow(smoothed_polygons6a) > 0){
-      smoothed_polygons6a <- smoothed_polygons6a %>%
-        st_union ()
-      this_feature_clipped <- st_difference(this_feature, smoothed_polygons6a)
-      # Convert geometry to POLYGON
-      this_feature_clipped <- st_cast(this_feature_clipped, "POLYGON")
-    } else {
-      this_feature_clipped <- this_feature
+  # smoothed_polygons7 <- parallel::mclapply(1:nrow(smoothed_polygons6), function(x){
+  #   #smoothed_polygons7 <- parallel::mclapply(1:100, function(x){
+  #   #x=53
+  #   this_feature <- smoothed_polygons6[x,]
+  #   intersections = st_intersects(x = smoothed_polygons6, y = smoothed_polygons6[x,])
+  #   intersections_log = lengths(intersections) > 0
+  #   smoothed_polygons6a = smoothed_polygons6[intersections_log, ] %>%
+  #     #filter (id != this_feature$id)# %>% 
+  #     #remove any that are larger (meaning id is lower value)
+  #     filter (id > this_feature$id) 
+  #   
+  #   if (nrow(smoothed_polygons6a) > 0){
+  #     smoothed_polygons6a <- smoothed_polygons6a %>%
+  #       st_union ()
+  #     this_feature_clipped <- st_difference(this_feature, smoothed_polygons6a)
+  #     # Convert geometry to POLYGON
+  #     this_feature_clipped <- st_cast(this_feature_clipped, "POLYGON")
+  #   } else {
+  #     this_feature_clipped <- this_feature
+  #   }
+  #   return (this_feature_clipped)
+  # }, mc.cores = 6L)
+  
+  smoothed_polygons7 <- parallel::mclapply(1:nrow(smoothed_polygons6), function(x) {
+    result <- try({
+      this_feature <- smoothed_polygons6[x,]
+      intersections = st_intersects(x = smoothed_polygons6, y = smoothed_polygons6[x,])
+      intersections_log = lengths(intersections) > 0
+      smoothed_polygons6a = smoothed_polygons6[intersections_log, ] %>%
+        #filter (id != this_feature$id)# %>% 
+        #remove any that are larger (meaning id is lower value)
+        filter (id > this_feature$id) 
+      
+      if (nrow(smoothed_polygons6a) > 0){
+        smoothed_polygons6a <- smoothed_polygons6a %>%
+          st_union ()
+        this_feature_clipped <- st_difference(this_feature, smoothed_polygons6a)
+        # Convert geometry to POLYGON
+        this_feature_clipped <- st_cast(this_feature_clipped, "POLYGON")
+      } else {
+        this_feature_clipped <- this_feature
+      }
+      return (this_feature_clipped)
+    }, silent = TRUE)
+    if (inherits(result, "try-error")) {
+      return(paste("Error in iteration", x, ":", result))
     }
-    return (this_feature_clipped)
-  }, mc.cores = 6L)
+    return(result)
+  }, mc.cores = parallel::detectCores())
   
   # Set CRS since it's missing
   smoothed_polygons7 <- lapply(smoothed_polygons7, function(x) {
