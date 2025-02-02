@@ -5,6 +5,8 @@ library(dplyr)
 library(parallel)
 library(data.table)
 
+print (paste("Count of cores:", parallel::detectCores()))
+
 timeframes <- c("24h", "48h", "72h", "season")
 
 lapply(1:3, function (x){
