@@ -47,10 +47,13 @@ lapply(1:3, function (x){
   smoothed_polygons6 <- smoothed_polygons5 %>%
     st_simplify(dTolerance = 500) %>% 
     st_make_valid() %>%
-    arrange(desc(area), desc(accumulation)) #%>%
-  
-  #file3 <- paste0("outputs/", timeframe, "/", timeframe, "_inches_snow_accumulation_latest.json")
-  #smoothed_polygons6 <- st_read (file3)
+    arrange(desc(area), desc(accumulation)) %>%
+    mutate (id = row_number())
+
+  #file3 <- paste0("outputs/", timeframe, "/", timeframe, "_inches_snow_accumulation_latest-orig.json")
+  #smoothed_polygons6 <- st_read (file3) %>%
+  #  arrange(desc(area), desc(accumulation)) %>% 
+  #  mutate (id = row_number())
   # 
   # geojsonio::topojson_write(smoothed_polygons6, 
   #                           file = file3,
@@ -66,10 +69,10 @@ lapply(1:3, function (x){
   #   intersections = st_intersects(x = smoothed_polygons6, y = smoothed_polygons6[x,])
   #   intersections_log = lengths(intersections) > 0
   #   smoothed_polygons6a = smoothed_polygons6[intersections_log, ] %>%
-  #     #filter (id != this_feature$id)# %>% 
+  #     #filter (id != this_feature$id)# %>%
   #     #remove any that are larger (meaning id is lower value)
-  #     filter (id > this_feature$id) 
-  #   
+  #     filter (id > this_feature$id)
+  # 
   #   if (nrow(smoothed_polygons6a) > 0){
   #     smoothed_polygons6a <- smoothed_polygons6a %>%
   #       st_union ()
@@ -82,7 +85,7 @@ lapply(1:3, function (x){
   #   return (this_feature_clipped)
   # }, mc.cores = 6L)
   
-  system.time( ####s for 15166 features in 72h
+  system.time(#337s for 15166 features in 72h; 203s for 11796 features in 24h
   smoothed_polygons7 <- parallel::mclapply(1:nrow(smoothed_polygons6), function(x) {
     result <- try({
       this_feature <- smoothed_polygons6[x,]
@@ -112,20 +115,20 @@ lapply(1:3, function (x){
   )
   
   # Set CRS since it's missing
-  smoothed_polygons7 <- lapply(smoothed_polygons7, function(x) {
+  smoothed_polygons8 <- lapply(smoothed_polygons7, function(x) {
     st_set_crs(x, 4326)
   })
   
-  file3 <- paste0("outputs/", timeframe, "/", timeframe, "_inches_snow_accumulation_latest.json")
-  
-  smoothed_polygons8 <- data.table::rbindlist(smoothed_polygons7, use.names=TRUE) %>%
+  smoothed_polygons9 <- data.table::rbindlist(smoothed_polygons8, use.names=TRUE) %>%
     st_as_sf() %>%
     group_by (accumulation) %>%
     summarize (geometry = st_union(geometry)) %>% 
     st_make_valid() %>%
-    st_simplify (dTolerance = 100) #adds tiny gaps here and there
+    st_simplify (dTolerance = 100) %>% #adds tiny gaps here and there
+    select (accumulation)
   
-  geojsonio::topojson_write(smoothed_polygons8, 
+  file3 <- paste0("outputs/", timeframe, "/", timeframe, "_inches_snow_accumulation_latest.json")
+  geojsonio::topojson_write(smoothed_polygons9, 
                             file = file3,
                             object_name = "snowfall", 
                             overwrite = TRUE)

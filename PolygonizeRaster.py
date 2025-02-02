@@ -21,6 +21,7 @@ def raster2vector(timeframe):
     
     path_to_raster = f"https://www.nohrsc.noaa.gov/snowfall/data/{month_str}/sfav2_CONUS_{timeframe}{date_str}{hour}.tif"
     out_path = f'python/{timeframe}snowfall.shp'
+    str_length = 30
 
     response = requests.head(path_to_raster)  # Send a HEAD request to check if the file exists
 
@@ -39,20 +40,20 @@ def raster2vector(timeframe):
             new_hour = "12"
 
         new_path_to_raster = f"https://www.nohrsc.noaa.gov/snowfall/data/{new_month}/sfav2_CONUS_{timeframe}{new_date}{new_hour}.tif"
-        print(f"{path_to_raster[-39:]} is unavailable.")
-        print(f"Now trying {new_path_to_raster[-39:]}")
+        print(f"{path_to_raster[-str_length:]} is unavailable.")
+        print(f"Now trying {new_path_to_raster[-str_length:]}")
     
         try:
             #r = gpd.read_file(new_path_to_raster)
             src_ds = gdal.Open(new_path_to_raster)
-            print(f"Pulled {new_path_to_raster[-39:]}")
+            print(f"Pulled {new_path_to_raster[-str_length:]}")
             #column_name = f"sfav2_CONUS_{timeframe}{new_date}{new_hour}.tif"
         except Exception as e:
             print(f"Error fetching data from {new_path_to_raster}: {e}")
     else:
         src_ds = gdal.Open(path_to_raster)
         #src_ds = gdal.Open(path_to_raster)
-        print(f"Pulled {path_to_raster[-39:]}")
+        print(f"Pulled {path_to_raster[-str_length:]}")
         #column_name = f"sfav2_CONUS_{timeframe}{date_str}{hour}.tif"
 
     '''ORIG CODE
