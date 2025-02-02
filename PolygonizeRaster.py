@@ -26,9 +26,19 @@ def raster2vector(timeframe):
 
     if response.status_code == 404:
         # Create a path for the previous day if the file is not available
-        new_date = (datetime.strptime(season_end[:8], "%Y%m%d") - timedelta(days=1)).strftime("%Y%m%d")
-        new_path_to_raster = f"https://www.nohrsc.noaa.gov/snowfall/data/{datetime.now().strftime('%Y%m')}/sfav2_CONUS_{season_start}_to_{new_date}12.tif"
-    
+        #Season path=new_date = (datetime.strptime(season_end[:8], "%Y%m%d") - timedelta(days=1)).strftime("%Y%m%d")
+        #new_path_to_raster = f"https://www.nohrsc.noaa.gov/snowfall/data/{datetime.now().strftime('%Y%m')}/sfav2_CONUS_{season_start}_to_{new_date}12.tif"
+            # Create a path for the previous day if the file is not available
+        if hour == "12":
+            new_month = month_str
+            new_date = (current_date - timedelta(days=1)).strftime("%Y%m%d")
+            new_hour = "00"
+        else:
+            new_month = (current_date - timedelta(days=1)).strftime("%Y%m")
+            new_date = (current_date - timedelta(days=1)).strftime("%Y%m%d")
+            new_hour = "12"
+
+        new_path_to_raster = f"https://www.nohrsc.noaa.gov/snowfall/data/{new_month}/sfav2_CONUS_{timeframe}{new_date}{new_hour}.tif"
         print(f"{path_to_raster[-39:]} is unavailable.")
         print(f"Now trying {new_path_to_raster[-39:]}")
     

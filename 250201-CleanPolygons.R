@@ -8,7 +8,7 @@ library(data.table)
 timeframes <- c("24h", "48h", "72h", "season")
 
 lapply(1:3, function (x){
-  #x=1
+  #x=3
   timeframe <- timeframes[[x]]
 
   this_shapefile <- st_read (paste0("python/", timeframe, "_snowfall.shp")) %>%
@@ -82,6 +82,7 @@ lapply(1:3, function (x){
   #   return (this_feature_clipped)
   # }, mc.cores = 6L)
   
+  system.time( ####s for 15166 features in 72h
   smoothed_polygons7 <- parallel::mclapply(1:nrow(smoothed_polygons6), function(x) {
     result <- try({
       this_feature <- smoothed_polygons6[x,]
@@ -108,6 +109,7 @@ lapply(1:3, function (x){
     }
     return(result)
   }, mc.cores = parallel::detectCores())
+  )
   
   # Set CRS since it's missing
   smoothed_polygons7 <- lapply(smoothed_polygons7, function(x) {
