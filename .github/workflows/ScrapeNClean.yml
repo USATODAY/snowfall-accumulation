@@ -34,6 +34,14 @@ jobs:
             any::jsonlite
             any::stars
             any::smoothr
+ 
+       #Added to try caching to save time.      
+      - name: Cache R packages
+        uses: actions/cache@v4 #changed from 2>4 because 2 is being phased out.
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
             
       - name: Scrape latest snowfall season accumulation data
         run: Rscript -e 'source("250130-SnowfallPolygons_season.R")'

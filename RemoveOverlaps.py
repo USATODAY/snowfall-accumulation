@@ -42,8 +42,8 @@ def dissolve_polygons(smoothed_polygons8):
     return smoothed_polygons9
 
 def save_topojson(geo_df, timeframe):
-    output_dir = "/Users/AFast/Documents/GitHub/snowfall-accumulation/outputs/"
-    file3 = f"/Users/AFast/Documents/GitHub/snowfall-accumulation/outputs/{timeframe}/{timeframe}_inches_snow_accumulation_latest.json"
+    output_dir = "outputs/"
+    file3 = f"outputs/{timeframe}/{timeframe}_inches_snow_accumulation_latest.json"
     
     # Convert the GeoDataFrame to TopoJSON
     topojson_data = topojson.Topology(geo_df)
@@ -65,7 +65,7 @@ timeframes = ["24h", "48h", "72h"]
 # Save the processed files (if you need to)
 for timeframe in timeframes:
     start_time = time.time()
-    file = f"/Users/AFast/Documents/GitHub/snowfall-accumulation/outputs/{timeframe}/{timeframe}_inches_snow_accumulation_latest.json"
+    file = f"outputs/{timeframe}/{timeframe}_inches_snow_accumulation_latest.json"
     # Load the GeoJSON file
     smoothed_polygons6 = gpd.read_file(file)
 
