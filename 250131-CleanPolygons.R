@@ -6,7 +6,7 @@ library(dplyr)
 timeframes <- c("24h", "48h", "72h", "season")
 
 lapply(1:3, function (x){
-  #x=1
+  #x=3
   timeframe <- timeframes[[x]]
   
   # this_shapefile <- st_read (paste0("python/", timeframe, "_snowfall.shp")) %>%
@@ -32,8 +32,8 @@ lapply(1:3, function (x){
   print ("starting smoothed_polygons")
   smoothed_polygons <- smooth(this_shapefile, method = "ksmooth")
   print ("starting smoothed_polygons2")
-  smoothed_polygons2 <- smoothed_polygons %>%
-    st_make_valid() 
+  #smoothed_polygons2 <- smoothed_polygons #%>%
+    #st_make_valid() 
   
   smoothed_polygons3 <- smoothed_polygons %>%
     st_transform(5070) %>%   # Convert to a projected CRS to avoid Error: Snap function moved vertex (nan, nan, nan) by 3.14159265358979, which is more than the specified snap radius of 1.23413730872177e-09
@@ -46,7 +46,7 @@ lapply(1:3, function (x){
   #buffer single pixels at 1300
   singlepixels <- smoothed_polygons3 %>% 
     filter (as.numeric(area) < 20000000) %>%
-    st_buffer (1200)
+    st_buffer (1200) 
   
   print ("starting multipixels")
   #buffer multipixel polygons s at 1500 to fill in gaps
@@ -57,12 +57,14 @@ lapply(1:3, function (x){
   print ("starting smoothed_polygons4")
   #rejoin two types
   smoothed_polygons4 <- rbind (multipixels, singlepixels) %>%
-    arrange (desc(area))
+    arrange (desc(area)) %>%
+    st_make_valid()
   
   print ("starting smoothed_polygons5")
   #smoothed_polygons4 <- st_buffer (smoothed_polygons3, 1300)
   smoothed_polygons5 <- st_transform(smoothed_polygons4, crs = 4326) %>%
-    arrange(desc(area))
+    arrange(desc(area)) %>%
+    st_make_valid()
   
   print ("starting smoothed_polygons6")
   smoothed_polygons6 <- smoothed_polygons5 %>%
