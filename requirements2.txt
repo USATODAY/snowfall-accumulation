@@ -1,0 +1,5 @@
+geopandas
+shapely
+topojson
+geojson
+json

@@ -1,6 +1,8 @@
 name: Scrape 'n Clean
 
 on:
+  repository_dispatch:
+    types: [trigger-scrape-n-clean]
   #schedule:
   #  - cron: '0 */6 * * *' # Run every six hours
   workflow_dispatch:
@@ -83,3 +85,12 @@ jobs:
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
+          
+      - name: Trigger Overlaps removal
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_GHA_PAT }}
+          repository: ${{ github.repository }}
+          event-type: trigger-overlaps-removal
+          client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'

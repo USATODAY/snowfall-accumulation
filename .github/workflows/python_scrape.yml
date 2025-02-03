@@ -56,7 +56,7 @@ jobs:
         shell: bash
 
       - name: Run script
-        run: python PolygonizeRaster.py
+        run: python PolygonizeRaster2.py
         
       - name: Commit results
         run: |
@@ -69,11 +69,11 @@ jobs:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
           username: github-actions
           
-      - name: Trigger season scrape workflow
+      - name: Trigger Scrape 'n Clean #season scrape workflow
         if: success()
         uses: peter-evans/repository-dispatch@v1
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
           repository: ${{ github.repository }}
-          event-type: trigger-season-scrape
+          event-type: trigger-scrape-n-clean #trigger-season-scrape
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'       
