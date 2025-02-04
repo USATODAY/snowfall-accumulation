@@ -123,6 +123,7 @@ timeframes = ["24h_", "48h_", "72h_"]
 snow_list = [raster2vector(timeframe) for timeframe in timeframes]
 
 # Now do seasonal map
+timeframe = "season_"
 # Get the current year
 current_year = datetime.now().year
 
