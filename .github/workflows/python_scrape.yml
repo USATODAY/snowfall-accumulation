@@ -75,5 +75,5 @@ jobs:
         with:
           token: ${{ secrets.REPO_GHA_PAT }}
           repository: ${{ github.repository }}
-          event-type: trigger-scrape-n-clean #trigger-season-scrape
+          event-type: trigger-scrape-n-clean-v2 #trigger-season-scrape
           client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'       

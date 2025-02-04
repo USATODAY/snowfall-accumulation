@@ -118,6 +118,6 @@ def raster2vector(timeframe):
     #return dst_ds
 
 # Iterate over the timeframes
-timeframes = ["24h_", "48h_", "72h_"]
+timeframes = ["24h_", "48h_", "72h_", "season_"]
 
 snow_list = [raster2vector(timeframe) for timeframe in timeframes]
