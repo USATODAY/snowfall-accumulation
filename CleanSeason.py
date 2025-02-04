@@ -39,7 +39,8 @@ def generate_hex_grid(bounds, hex_size):
     return gpd.GeoDataFrame(geometry=hexagons, crs="EPSG:4326")  # Adjust CRS as needed
 
 # Load your raster-derived polygon shapefile
-square_polygons = gpd.read_file("/Users/AFast/Documents/GitHub/snowfall-accumulation/python/season_snowfall.shp")
+#square_polygons = gpd.read_file("/Users/AFast/Documents/GitHub/snowfall-accumulation/python/season_snowfall.shp")
+square_polygons = gpd.read_file("python/season_snowfall.shp")
     
 # Rename the column 'DN' to 'accumulation'
 square_polygons = square_polygons.rename(columns={"DN": "accumulation"})
@@ -107,7 +108,9 @@ geojson_data = json.loads(hex_grid3.to_json())
 geojson_data["name"] = "snowfall"
 
 # Save to a file
-output_path = "/Users/AFast/Documents/GitHub/snowfall-accumulation/python/outputs/season_simp2.json"
+#output_path = "/Users/AFast/Documents/GitHub/snowfall-accumulation/python/outputs/season_simp2.json"
+output_path = "python/outputs/season_simp2.json"
+
 #with open(output_path, "w") as f:
 #    json.dump(geojson_data, f, indent=4) #prettyprint
 with open(output_path, "w") as f:

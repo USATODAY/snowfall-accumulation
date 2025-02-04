@@ -1,4 +1,4 @@
-name: Scrape 'n Clean
+name: Scrape 'n Clean v2
 
 on:
   repository_dispatch:
