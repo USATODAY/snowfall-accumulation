@@ -2,5 +2,4 @@ geopandas
 shapely
 topojson
 geojson
-time
 numpy
