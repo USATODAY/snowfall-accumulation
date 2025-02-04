@@ -131,7 +131,7 @@ start_time = time.time()
 #For GH Actions
 mapshaper_path = "mapshaper"
 input_geojson = "python/outputs/season_simp2.json"
-output_topojson = "outputs/season_inches_snow_accumulation_latest.json"
+output_topojson = "outputs/season/season_inches_snow_accumulation_latest.json"
 
 # Convert to TopoJSON with a named layer
 subprocess.run([

@@ -36,8 +36,8 @@ jobs:
           pip install -r requirements2.txt
           #pip install osgeo  # Sometimes needed separately
           
-      #- name: Remove overlaps from day timeframes
-      #  run: python RemoveOverlaps.py
+      - name: Remove overlaps from day timeframes
+        run: python RemoveOverlaps.py
         
       - name: Create hexagon tessalation and compress season map
         run: python CleanSeason.py
