@@ -56,7 +56,8 @@ jobs:
         shell: bash
 
       - name: Run script
-        run: python PolygonizeRaster2.py
+        #run: python PolygonizeRaster2.py
+        run: python PolygonizeRaster3.py
         
       - name: Commit results
         run: |
