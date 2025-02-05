@@ -64,8 +64,8 @@ hex_size = 0.065 # 9.4MB- 140s degrees
 hex_size = 8000 #for 3857 meters
 hex_grid = generate_hex_grid(square_polygons.total_bounds, hex_size)
 
-# Ensure CRS
-hex_grid.set_crs(epsg=3857, inplace=True)
+# Ensure CRS matches
+hex_grid.to_crs(epsg=3857, inplace=True)
 
 # Spatial join to transfer attributes from square polygons to hexagons
 hex_grid = hex_grid.sjoin(square_polygons, how="left", predicate="intersects")
@@ -108,6 +108,9 @@ hex_grid3["geometry"] = hex_grid3["geometry"].apply(lambda g: unary_union(g) if 
 # Ensure geometries are valid
 #hex_grid3["geometry"] = hex_grid3["geometry"].apply(lambda geom: geom.buffer(0))
 hex_grid3["geometry"] = hex_grid3["geometry"].apply(lambda g: g.buffer(0) if not g.is_valid else g)
+
+# Reproject to work with Mapbox
+hex_grid3.set_crs(epsg=4326, inplace=True)
 
 start_time = time.time()
 # Export to a dictionary
