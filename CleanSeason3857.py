@@ -110,7 +110,7 @@ hex_grid3["geometry"] = hex_grid3["geometry"].apply(lambda g: unary_union(g) if 
 hex_grid3["geometry"] = hex_grid3["geometry"].apply(lambda g: g.buffer(0) if not g.is_valid else g)
 
 # Reproject to work with Mapbox
-hex_grid3.set_crs(epsg=4326, inplace=True)
+hex_grid3.to_crs(epsg=4326, inplace=True)
 
 start_time = time.time()
 # Export to a dictionary
