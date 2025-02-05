@@ -72,6 +72,9 @@ for timeframe in timeframes:
     # Add id column 
     smoothed_polygons6["id"] = range(1, len(smoothed_polygons6) + 1)
 
+	# Fix invalid geometries
+    smoothed_polygons6["geometry"] = smoothed_polygons6["geometry"].buffer(0)
+
     # Remove overlaps
     smoothed_polygons6["geometry"] = smoothed_polygons6.apply(lambda row: process_feature(row.name, smoothed_polygons6), axis=1)
 
