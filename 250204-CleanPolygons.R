@@ -5,6 +5,7 @@ library(dplyr)
 library(stringr)
 library(jsonlite)
 library(tesseract)
+library(lubridate)
 
 timeframes <- c("24h", "48h", "72h", "season")
 
